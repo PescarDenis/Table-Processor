@@ -9,4 +9,3 @@ trait TableInterface {
   def lastColumn : Option[Int] ///returns the index of the las column or None if there are no columns
   def nonEmptyPositions : Iterable[ParseTableCells] //returns a collection of all positions of nonempty cells
 }
-dadwadawdawda

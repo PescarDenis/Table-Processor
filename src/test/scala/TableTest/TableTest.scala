@@ -5,7 +5,7 @@ import Table.{Table, ParseTableCells}
 import File_Reader.MockCSVReader
 import ExpressionAST.{AddExpression, ConstantExpression,CellReferenceExpression}
 import Evaluation.EvaluationTypes.IntResult
-
+import Evaluation.EvaluationError
 class TableTest extends AnyFunSuite {
 
   test("BasicTable with mock CSVReader including formulas and cell names") {
@@ -33,9 +33,7 @@ class TableTest extends AnyFunSuite {
     assert(table.getCell(ParseTableCells.parse("B3").get).get == "2")      // B3 = 2
 
     // Test formula cells using cell names
-    assert(table.getCell(ParseTableCells.parse("C1").get).get == AddExpression(CellReferenceExpression( ParseTableCells.parse("A1").get),ConstantExpression(IntResult(22))).toString) // C1 = "=A1 + 22"
-
-    // Test non-empty positions with actual cell names
+    assert(table.getCell(ParseTableCells.parse("C1").get).get == AddExpression(CellReferenceExpression( ParseTableCells.parse("A1").get),ConstantExpression(IntResult(22))).toString) // C1 = "=A1 + 22"// Test non-empty positions with actual cell names
     val nonEmptyPos = table.nonEmptyPositions
     assert(nonEmptyPos.exists(p => p == ParseTableCells.parse("B1").get)) // Cell B1 should not be empty
     assert(nonEmptyPos.exists(p => p == ParseTableCells.parse("A2").get)) // Cell A2 should not be empty

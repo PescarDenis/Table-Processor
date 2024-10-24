@@ -2,13 +2,25 @@ package Table
 
 import TableEntries._
 import File_Reader.CSVReader
+import Evaluation.EvaluationTypes.EvaluationResult
+
 class Table extends TableInterface {
   private var rows: Map[ParseTableCells, TableEntry] = Map()
+  private var evaluatedResults: Map[ParseTableCells, EvaluationResult[_]] = Map() // Separate map to store evaluated results
 
-  def getRows: Map[ParseTableCells, TableEntry] = rows
-  // Retrieve a cell at a given position
-  override def getCell(pos: ParseTableCells): TableEntry = {
+  // Method to retrieve the raw TableEntry
+  def getCell(pos: ParseTableCells): TableEntry = {
     rows.getOrElse(pos, Empty(pos.row, pos.col))
+  }
+
+  // Method to store the evaluated result
+  def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[_]): Unit = {
+    evaluatedResults += (pos -> result)
+  }
+
+  // Method to get the evaluated result if it exists
+  def getEvaluatedResult(pos: ParseTableCells): Option[EvaluationResult[_]] = {
+    evaluatedResults.get(pos)
   }
 
   // Get the index of the last row, or None if the table is empty
@@ -26,13 +38,13 @@ class Table extends TableInterface {
     rows.keys
   }
 
+  // Parse the CSV data into the table
   def parse(csvReader: CSVReader): Table = {
-    // Iterate through the rows returned by csvReader
     rows = csvReader.zipWithIndex.flatMap { case (row, rowIndex) =>
       // For each row, iterate through the columns (cell values)
       row.zipWithIndex.map { case (cellValue, colIndex) =>
-        val cellPos = ParseTableCells(rowIndex+1, colIndex+1)
-        val entry = parseCell(cellValue, rowIndex+1, colIndex+1) // Parse each cell
+        val cellPos = ParseTableCells(rowIndex + 1, colIndex + 1)
+        val entry = parseCell(cellValue, rowIndex + 1, colIndex + 1) // Parse each cell
         cellPos -> entry // Store the position and the parsed entry in the map
       }
     }.toMap // Convert the sequence of tuples to a map
@@ -49,7 +61,7 @@ class Table extends TableInterface {
       formulaEntry
     } else {
       try {
-        val numberEntry =  Number(rowIndex, colIndex)
+        val numberEntry = Number(rowIndex, colIndex)
         numberEntry.set(cellValue) // Call the set method to populate numberValue
         numberEntry // Return the Number entry
       } catch {
