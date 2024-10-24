@@ -17,5 +17,5 @@ case class Number(row : Int, col : Int) extends TableEntry(row , col) {
   }
 
   override def isEmpty: Boolean = numberValue.isEmpty //we have a number so it is not empty
-  
+
 }

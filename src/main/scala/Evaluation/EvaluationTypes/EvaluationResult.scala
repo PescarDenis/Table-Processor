@@ -8,4 +8,3 @@ trait EvaluationResult[T] {
 }
 
 
-

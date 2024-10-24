@@ -42,7 +42,7 @@ class Table extends TableInterface {
   // Helper method to parse individual cells into TableEntry objects
   private def parseCell(cellValue: String, rowIndex: Int, colIndex: Int): TableEntry = {
     if (cellValue.trim.isEmpty) {
-       Empty(rowIndex, colIndex)
+      Empty(rowIndex, colIndex)
     } else if (cellValue.startsWith("=")) {
       val formulaEntry = new Formula(rowIndex, colIndex)
       formulaEntry.set(cellValue) // Call the set method to populate the formula
@@ -54,7 +54,7 @@ class Table extends TableInterface {
         numberEntry // Return the Number entry
       } catch {
         case _: NumberFormatException =>
-           Empty(rowIndex, colIndex)
+          Empty(rowIndex, colIndex)
       }
     }
   }

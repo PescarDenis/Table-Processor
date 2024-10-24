@@ -75,24 +75,24 @@ class TableEvaluatorTest extends AnyFunSuite {
     // Check that the exception contains the circular dependency error message
     assert(thrownException.getMessage.contains("Circular dependency detected at cell: A1"))
   }
-    test("Circular dependency: Formula referecing each others") {
-      // Create context with a formula that references itself
-      val context = new EvaluationContext(Map(
-        ParseTableCells(1, 1) -> new Formula(1, 1), // A1 as a formula
-        ParseTableCells(1, 2) -> new Formula(1, 2)
-      ))
+  test("Circular dependency: Formula referecing each others") {
+    // Create context with a formula that references itself
+    val context = new EvaluationContext(Map(
+      ParseTableCells(1, 1) -> new Formula(1, 1), // A1 as a formula
+      ParseTableCells(1, 2) -> new Formula(1, 2)
+    ))
 
-      // Set A1 to reference itself (A1 = A1 + 1)
-      context.lookup(ParseTableCells(1, 1)).set("=B1 + 1")
-      context.lookup(ParseTableCells(1, 2)).set("=A1 + 1")
+    // Set A1 to reference itself (A1 = A1 + 1)
+    context.lookup(ParseTableCells(1, 1)).set("=B1 + 1")
+    context.lookup(ParseTableCells(1, 2)).set("=A1 + 1")
 
-      val evaluator = new TableEvaluator(context)
-      val thrownException = intercept[IllegalArgumentException] {
-        evaluator.evaluateAllCells() // Attempt to evaluate all cells
+    val evaluator = new TableEvaluator(context)
+    val thrownException = intercept[IllegalArgumentException] {
+      evaluator.evaluateAllCells() // Attempt to evaluate all cells
 
-      }
+    }
 
-      // Assert that the exception contains the correct circular dependency error message
-      assert(thrownException.getMessage.contains("Circular dependency detected at cell: B1"))
+    // Assert that the exception contains the correct circular dependency error message
+    assert(thrownException.getMessage.contains("Circular dependency detected at cell: B1"))
   }
 }

@@ -16,7 +16,7 @@ class TableEvaluator(context: EvaluationContext) {
     context.lookup(cell) match {
       case formula: Formula =>
         formula.evaluate(context, visited).asInstanceOf[EvaluationResult[T]]
-        
+
       case number: Number =>
         number.numberValue match {
           case Some(value) => IntResult(value).asInstanceOf[EvaluationResult[T]]
