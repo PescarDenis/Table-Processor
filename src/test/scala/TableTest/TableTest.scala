@@ -1,11 +1,13 @@
 package TableTest
 
 import org.scalatest.funsuite.AnyFunSuite
-import Table.{Table, ParseTableCells}
+import Table.ParseTableCells
 import File_Reader.MockCSVReader
 import ExpressionAST.{AddExpression, ConstantExpression,CellReferenceExpression}
 import Evaluation.EvaluationTypes.IntResult
 import Evaluation.EvaluationError
+import Table.DefinedTabels.BaseTable
+
 class TableTest extends AnyFunSuite {
 
   test("BasicTable with mock CSVReader including formulas and cell names") {
@@ -20,7 +22,7 @@ class TableTest extends AnyFunSuite {
     val mockCSVReader = new MockCSVReader(mockData)
 
     // Create a BasicTable and parse the mock CSV data
-    val table = new Table().parse(mockCSVReader)
+    val table = new BaseTable().parse(mockCSVReader)
 
     // Test last row and column
     assert(table.lastRow.contains(3))

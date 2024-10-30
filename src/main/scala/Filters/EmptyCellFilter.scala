@@ -1,14 +1,17 @@
 package Filters
 
 import Table.ParseTableCells
-import Evaluation.EvaluationTypes.{EvaluationResult, EmptyResult}
+import Evaluation.EvaluationTypes.{EmptyResult, EvaluationResult}
 
 // Single class to filter empty or non-empty cells
-case class EmptyCellFilter(column: Table.ParseTableCells, isEmpty: Boolean) extends TableFilter[Any] {
-  override def matches(row: Map[Table.ParseTableCells, EvaluationResult[_]]): Boolean = {
-    row.get(column) match {
-      case Some(EmptyResult) => isEmpty // True if looking for empty cells
-      case _ => !isEmpty // True if looking for non-empty cells
+case class EmptyCellFilter(column: String, isEmpty: Boolean) extends TableFilter {
+
+  override def matches(row: Map[ParseTableCells, EvaluationResult[_]]): Boolean = {
+    row.find { case (cell, _) => ParseTableCells.getColName(cell.col) == column } match {
+      case Some((_, EmptyResult)) => isEmpty
+      case Some((_, _)) => !isEmpty
+      case None => isEmpty // If cell is missing, treat it as empty if isEmpty is true
     }
   }
 }
+

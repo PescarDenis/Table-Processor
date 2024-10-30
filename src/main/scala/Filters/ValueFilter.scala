@@ -1,29 +1,32 @@
 package Filters
 
 import Table.ParseTableCells
-import Evaluation.EvaluationTypes.{EvaluationResult,IntResult,FloatResult}
-// Abstract class for value filtering
-case class ValueFilter[T](column: Table.ParseTableCells, operator: String, value: T)(implicit ordering: Ordering[T]) extends TableFilter[T] {
+import Evaluation.EvaluationTypes.{EvaluationResult, FloatResult, IntResult}
+
+// ValueFilter for filtering by column values with comparison operators
+case class ValueFilter(column: String, operator: String, value: Double) extends TableFilter {
+
   override def matches(row: Map[ParseTableCells, EvaluationResult[_]]): Boolean = {
-    row.get(column) match {
-      case Some(IntResult(v)) if value.isInstanceOf[Int] =>
-        compareValues(v.asInstanceOf[T])
-      case Some(FloatResult(v)) if value.isInstanceOf[Double] =>
-        compareValues(v.asInstanceOf[T])
-      case _ => false
+    row.find { case (cell, _) => ParseTableCells.getColName(cell.col) == column } match {
+      case Some((_, IntResult(cellValue))) =>
+        applyOperator(cellValue.toDouble, value, operator) // Convert Int to Double
+
+      case Some((_, FloatResult(cellValue))) =>
+        applyOperator(cellValue, value, operator)
+
+      case _ => false // Unsupported or mismatched types
     }
   }
 
-  private def compareValues(cellValue: T): Boolean = {
+  private def applyOperator[T](cellValue: T, targetValue: T, operator: String)(implicit ord: Ordering[T]): Boolean = {
     operator match {
-      case "<"  => ordering.lt(cellValue, value)
-      case ">"  => ordering.gt(cellValue, value)
-      case "<=" => ordering.lteq(cellValue, value)
-      case ">=" => ordering.gteq(cellValue, value)
-      case "==" => ordering.equiv(cellValue, value)
-      case "!=" => !ordering.equiv(cellValue, value)
+      case "<"  => ord.lt(cellValue, targetValue)
+      case ">"  => ord.gt(cellValue, targetValue)
+      case "<=" => ord.lteq(cellValue, targetValue)
+      case ">=" => ord.gteq(cellValue, targetValue)
+      case "==" => ord.equiv(cellValue, targetValue)
+      case "!=" => !ord.equiv(cellValue, targetValue)
       case _ => false
     }
   }
 }
-

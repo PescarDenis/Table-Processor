@@ -1,11 +1,35 @@
 package Table
-import TableEntries.TableEntry
-import File_Reader.{CSVReader,CSVSeparator}
-import scala.io.Source
-///a base interface to manage the tabular data containing TableEntries
+
+import Evaluation.EvaluationTypes.EvaluationResult
+import Table.TableEntries.TableEntry
+
 trait TableInterface {
-  def getCell(pos : ParseTableCells) : TableEntry //takes the position of the cell and returns what we get in that cell
-  def lastRow : Option[Int] ///returns the index of the last row or None if the table is empty
-  def lastColumn : Option[Int] ///returns the index of the las column or None if there are no columns
-  def nonEmptyPositions : Iterable[ParseTableCells] //returns a collection of all positions of nonempty cells
+  // Retrieve a raw TableEntry (e.g., Number, Formula, or Empty) at a specific position
+  def getCell(pos: ParseTableCells): TableEntry
+
+  // Retrieve a full row of evaluated results by row index
+  def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[_]]
+
+  // Get the index of the last row or None if the table is empty
+  def lastRow: Option[Int]
+
+  // Get the index of the last column or None if the table is empty
+  def lastColumn: Option[Int]
+
+  // Return a collection of all positions of non-empty cells
+  def nonEmptyPositions: Iterable[ParseTableCells]
+
+  // Store an evaluated result for a specific cell position
+  def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[_]): Unit
+
+  // Retrieve an evaluated result as an EvaluationResult type for filtering or other purposes
+  def getEvaluatedResult(pos: ParseTableCells): Option[EvaluationResult[_]]
+
+  // Retrieve an evaluated result as a String for output purposes
+  def getEvaluatedResultAsString(pos: ParseTableCells): String
+
+  // Parse the CSV data into the table
+  def parse(csvReader: File_Reader.CSVReader): TableInterface
+
 }
+
