@@ -1,13 +1,15 @@
 package Table.TableEntries
+
 import Evaluation.EvaluationTypes.EvaluationResult
 import ExpressionAST.{Expression, EvaluationContext}
-import ExpressionParser.{Lexer, Parser}
+import ExpressionParser.LexerLogic.Lexer
+import ExpressionParser.ParserLogic.{Parser, ExpressionBuilder}
 import Table.ParseTableCells
 
 // Formula class for handling either formulas (e.g., =10*2) or raw implementations like 20*3
 class Formula(row: Int, col: Int) extends TableEntry(row, col) {
 
-  private var expression: Option[Expression[_]] = None //store the parsed Expression
+  private var expression: Option[Expression[_]] = None // store the parsed Expression
 
   override def get: String = expression.map(_.toString).getOrElse("")
 
@@ -35,7 +37,7 @@ class Formula(row: Int, col: Int) extends TableEntry(row, col) {
   private def parseExpression(exprStr: String): Expression[_] = {
     val lexer = new Lexer(exprStr)
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens)
+    val parser = new Parser(tokens, expressionBuilder) // Inject expressionBuilder into the parser
     parser.parse() // Return the parsed Expression
   }
 }

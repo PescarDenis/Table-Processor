@@ -1,4 +1,5 @@
-package ExpressionParser
+package ExpressionParser.LexerLogic
+
 
 sealed trait Tokens //base type for all tokens
 case class NumberToken(value : String) extends Tokens //represents a number found in the formula

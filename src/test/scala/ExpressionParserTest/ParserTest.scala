@@ -2,18 +2,19 @@ package ExpressionParserTest
 
 import Evaluation.EvaluationTypes.{FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
-import ExpressionParser.{Parser,Lexer}
 import ExpressionAST.{ConstantExpression,CellReferenceExpression,AddExpression,SubtractExpression,MultiplyExpression,DivideExpression,EvaluationContext}
+import ExpressionParser.LexerLogic.Lexer
+import ExpressionParser.ParserLogic._
 import Table.ParseTableCells
 import Table.TableEntries.{Number,TableEntry}
 class ParserTest extends AnyFunSuite {
+  val expressionBuilder = new ExpressionBuilder[Any] // Use appropriate generic type if needed
   test("test1") {
 
     val context = new EvaluationContext(Map.empty) //empty evaluation context for testing
-
     val lexer = new Lexer("1+2*3")
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens)
+    val parser = new Parser(tokens,expressionBuilder)
     val expression = parser.parse()
 
     val expressionAST = MultiplyExpression(
@@ -23,7 +24,7 @@ class ParserTest extends AnyFunSuite {
   test("test2") {
     val lexer = new Lexer("2 * D4 / A3")
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens)
+    val parser = new Parser(tokens,expressionBuilder)
     val expression = parser.parse()
 
     val expressionAST = DivideExpression(MultiplyExpression(
@@ -41,7 +42,7 @@ class ParserTest extends AnyFunSuite {
 
     val lexer = new Lexer("3+5*4/3")
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens)
+    val parser = new Parser(tokens,expressionBuilder)
     val expression = parser.parse()
 
 
@@ -61,7 +62,7 @@ class ParserTest extends AnyFunSuite {
 
     val lexer = new Lexer("A1 - 5 * B1 / 2")
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens)
+    val parser = new Parser(tokens,expressionBuilder)
     val expression = parser.parse()
 
     // Evaluate the expression
@@ -80,7 +81,7 @@ class ParserTest extends AnyFunSuite {
     val exception = intercept[IllegalArgumentException] {
       parser.parse() // This should throw an IllegalArgumentException
     }
-    assert(exception.getMessage.contains("Unexpected token at position"))
+    assert(exception.getMessage.contains("Unexpected operator at position"))
   }
 }
 

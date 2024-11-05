@@ -38,12 +38,15 @@ class CSVPrinterTest extends AnyFunSuite {
     ParseTableCells(5, 5) -> IntResult(1)
   )
   val table: TableInterface = new MockTableForTests(data)
+  //register PrettyPrinters in the registry before each test
+  PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+  PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
 
   test("Normal output after evaluation, no range,filter,only headers") {
     val mockOutputHandler = new MockOutputHandler()
-    val CSVPrettyPrinter = new CSVPrettyPrinter(CSVSeparator(","))
+    val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
-    val tablePrinter = new TablePrinter(CSVPrettyPrinter)
+    val tablePrinter = new TablePrinter(prettyPrinter)
 
     // Define range and filter
     val range: Option[(ParseTableCells, ParseTableCells)] = None
@@ -68,8 +71,9 @@ class CSVPrinterTest extends AnyFunSuite {
 
   test("range + headers") {
     val mockOutputHandler = new MockOutputHandler()
-    val CSVPrettyPrinter = new CSVPrettyPrinter(CSVSeparator(","))
-    val tablePrinter = new TablePrinter(CSVPrettyPrinter) //in this way the stdout output is also tested
+    val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
+
+    val tablePrinter = new TablePrinter(prettyPrinter)
 
     // Define a range from B2 to D4 with headers included
 
@@ -89,8 +93,9 @@ class CSVPrinterTest extends AnyFunSuite {
   }
   test("Range with Filter") {
     val mockOutputHandler = new MockOutputHandler()
-    val csvPrettyPrinter = new CSVPrettyPrinter(CSVSeparator(","))
-    val tablePrinter = new TablePrinter(csvPrettyPrinter)
+    val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
+
+    val tablePrinter = new TablePrinter(prettyPrinter)
     // Define a range from B2 to D4 with a filter on column E to check for non-empty cells
     val range = Some((ParseTableCells(2, 2), ParseTableCells(4, 4)))
     val filter = Some(EmptyCellFilter("E", isEmpty = false)) // Only include rows where column E is non-empty

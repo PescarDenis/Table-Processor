@@ -1,13 +1,14 @@
 package PrettyPrintTest
 
 import org.scalatest.funsuite.AnyFunSuite
-import PrettyPrint.*
+import PrettyPrint._
 import Table.ParseTableCells
-import Evaluation.EvaluationTypes.*
+import Evaluation.EvaluationTypes._
 import Filters.ValueFilter
-import Table.DefinedTabels.*
-import Table.*
-import OutputDestination.*
+import Table.DefinedTabels._
+import Table._
+import OutputDestination._
+import File_Reader.CSVSeparator
 class MarkdownPrettyPrinterTest extends  AnyFunSuite {
 
   val data = Map(
@@ -20,11 +21,14 @@ class MarkdownPrettyPrinterTest extends  AnyFunSuite {
   )
 
   val table = new MockTableForTests(data)
+  PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+  PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
 
   test("Markdown Output with Headers") {
     val mockOutputHandler = new MockOutputHandler()
 
-    val markdownPrettyPrinter = new MarkdownPrettyPrinter
+    //for test purposes, the CSV separator does not matter when we use MD
+    val markdownPrettyPrinter = PrettyPrinterRegistry.getPrinter("md", CSVSeparator(","))
     val tablePrinter = new TablePrinter(markdownPrettyPrinter)
 
     // Print the table with headers
@@ -48,7 +52,8 @@ class MarkdownPrettyPrinterTest extends  AnyFunSuite {
   test("Markdown Output with NO Headers") {
     val mockOutputHandler = new MockOutputHandler()
 
-    val markdownPrettyPrinter = new MarkdownPrettyPrinter
+    //for test purposes, the CSV separator does not matter when we use MD
+    val markdownPrettyPrinter = PrettyPrinterRegistry.getPrinter("md", CSVSeparator(";;;"))
     val tablePrinter = new TablePrinter(markdownPrettyPrinter)
 
     // Print the table with headers
@@ -72,8 +77,8 @@ class MarkdownPrettyPrinterTest extends  AnyFunSuite {
   test("Markdown Output with Filter (C = 1)") {
     val mockOutputHandler = new MockOutputHandler()
 
-
-    val markdownPrettyPrinter = new MarkdownPrettyPrinter
+    //for test purposes, the CSV separator does not matter when we use MD
+    val markdownPrettyPrinter = PrettyPrinterRegistry.getPrinter("md", CSVSeparator(","))
     val tablePrinter = new TablePrinter(markdownPrettyPrinter)
 
     // Print the table with headers and filter

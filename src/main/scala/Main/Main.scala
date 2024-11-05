@@ -2,49 +2,109 @@ package Main
 
 import ProcessingModules._
 import CLIInterface._
+import PrettyPrint._
+import scala.io.StdIn
+import Table.DefinedTabels.BaseTable
 
 object Main {
   def printWelcomeMessage(): Unit = {
     println("Welcome to the Table Processor CLI!")
     println("Please provide everything after the sbt statement in double quotes.")
-    println("Run the program first by inputing the desired file and check that none of the cells are rendered as ERROR")
-    println("If you are unsure where to start type sbt run --help or -h.")
+    println("Run the program first by inputting the desired file and check that none of the cells are rendered as ERROR.")
+    println("If you are unsure where to start, type --help or -h for guidance.")
   }
 
   def main(args: Array[String]): Unit = {
+    // Register PrettyPrinters
+    PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+    PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
+
     val cli = new CLI()
 
-    if (args.isEmpty) {
-      printWelcomeMessage()
-      return
+    // Show welcome message and enter command loop
+    printWelcomeMessage()
+    var running = true
+
+    while (running) {
+      print("\nEnter a command: ")
+      val input = StdIn.readLine().trim
+
+      input match {
+        case "--help" | "-h" =>
+          cli.printHelp()
+        case "exit" =>
+          println("Exiting the CLI. Goodbye!")
+          running = false
+        case _ =>
+          val config = cli.parse(input.split("\\s+").toList)
+          config match {
+            case Some(conf) if conf.inputFile.isDefined =>
+              try {
+                processWorkflow(conf)
+              } catch {
+                case ex: Exception =>
+                  println(s"An error occurred: ${ex.getMessage}")
+              }
+            case Some(_) =>
+              println("Error: --input-file is required. Exiting program.")
+              sys.exit(1) // Exit immediately if input file is not provided
+            case None =>
+              println("Invalid input or configuration. Please try again.")
+          }
+      }
     }
+  }
 
-    val configOpt = cli.parse(args.toList)
+  private def processWorkflow(config: CLIConfig): Unit = {
+    val table = loadTable(config)
+    evaluateTable(table)
+    applyFilters(config, table)
+    val selectedTable = selectRange(config, table)
+    outputTable(config, selectedTable)
+  }
 
-    configOpt match {
-      case Some(config) =>
-        // Step 1: Load the input file
-        val inputLoader = new InputLoader(config)
-        val table = inputLoader.loadTable()
+  private def loadTable(config: CLIConfig): BaseTable = {
+    println("\nLoading table...")
+    val inputLoader = new InputLoader(config)
+    val table = inputLoader.loadTable()
+    println("Table loaded successfully.")
+    table
+  }
 
-        // Step 2: Evaluate all formulas
-        val evaluator = new Evaluator(table)
-        evaluator.evaluateAll()
+  private def evaluateTable(table: BaseTable): Unit = {
+    println("\nEvaluating formulas...")
+    val evaluator = new Evaluator(table)
+    evaluator.evaluateAll()
+    println("Formulas evaluated successfully.")
+  }
 
-        // Step 3: Apply filters
-        val filterProcessor = new Filtering(config, table)
-        filterProcessor.applyFilters()
+  private def applyFilters(config: CLIConfig, table: BaseTable): Unit = {
+    if (config.filters.nonEmpty) {
+      println("\nApplying filters...")
+      val filtering = new Filtering(config, table)
+      filtering.applyFilters()
+      println("Filters applied successfully.")
+    } else {
+      println("\nNo filters specified. Skipping filtering step.")
+    }
+  }
 
-        // Step 4: Select the specified range of cells
+  private def selectRange(config: CLIConfig, table: BaseTable): BaseTable = {
+    config.range match {
+      case Some((start, end)) =>
+        println(s"\nSelecting range from $start to $end...")
         val rangeSelector = new RangeSelector(config, table)
-        val selectedTable = rangeSelector.selectRange()
-
-        // Step 5: Output the table in the specified format
-        val tableOutput = new TableOutput(config, selectedTable)
-        tableOutput.output()
-
+        rangeSelector.selectRange()
       case None =>
-        println("Failed to execute due to invalid configuration.")
+        println("\nNo range specified. Using the entire table.")
+        table
     }
+  }
+
+  private def outputTable(config: CLIConfig, table: BaseTable): Unit = {
+    println("\nOutputting table...")
+    val tableOutput = new TableOutput(config, table)
+    tableOutput.output()
+    println("Table output completed.")
   }
 }

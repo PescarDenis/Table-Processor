@@ -1,7 +1,7 @@
 package ExpressionParserTest
 
+import ExpressionParser.LexerLogic.{LeftParenthesis, Lexer, NumberToken, OperatorToken, RefToken, RightParenthesis, Tokens}
 import org.scalatest.funsuite.AnyFunSuite
-import ExpressionParser.{LeftParenthesis, Lexer, NumberToken, OperatorToken, RefToken, RightParenthesis, Tokens}
 
 //Lexer testing
 class LexerTest extends AnyFunSuite{
