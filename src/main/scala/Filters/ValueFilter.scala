@@ -9,15 +9,15 @@ case class ValueFilter(column: String, operator: String, value: Double) extends 
   override def matches(row: Map[ParseTableCells, EvaluationResult[_]]): Boolean = {
     row.find { case (cell, _) => ParseTableCells.getColName(cell.col) == column } match {
       case Some((_, IntResult(cellValue))) =>
-        applyOperator(cellValue.toDouble, value, operator) // Convert Int to Double
+        applyOperator(cellValue.toDouble, value, operator) //convert Int to Double
 
       case Some((_, FloatResult(cellValue))) =>
         applyOperator(cellValue, value, operator)
 
-      case _ => false // Unsupported or mismatched types
+      case _ => false //unsupported or mismatched types
     }
   }
-
+  //helper method to apply the specified comparison operator
   private def applyOperator[T](cellValue: T, targetValue: T, operator: String)(implicit ord: Ordering[T]): Boolean = {
     operator match {
       case "<"  => ord.lt(cellValue, targetValue)

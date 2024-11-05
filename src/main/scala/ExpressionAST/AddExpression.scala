@@ -2,6 +2,7 @@ package ExpressionAST
 
 import Evaluation.EvaluationTypes.{EvaluationResult, FloatResult, IntResult}
 import Evaluation.EvaluationError
+//a case class that performs the addition of two expressions
 case class AddExpression[T](left: Expression[T], right: Expression[T]) extends BinaryOperationExpression[T](left, right) {
 
   override def operator(leftValue: EvaluationResult[T], rightValue: EvaluationResult[T]): EvaluationResult[T] = {

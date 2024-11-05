@@ -1,44 +1,75 @@
 package PrettyPrint
 
-import Table.TableInterface
-import Table.ParseTableCells
+import Table.{ParseTableCells, TableInterface}
+import Table.DefinedTabels.{TableRange, TableFilterEvaluator}
+import Filters.TableFilter
 
-//convert the table data into makrdown formatted string
-// include headers it s a flag wether to include headers into the printing
-class MarkdownPrettyPrinter(includeHeaders: Boolean) extends PrettyPrinter {
+//Markdown printer class -> knows how to print the table in the MD format
+class MarkdownPrettyPrinter extends PrettyPrinter {
+  //the padding methods are used for aligning the text
+  //pad a string to the left
   private def padLeft(s: String, width: Int): String = {
     val padding = " " * (width - s.length)
-    s"$padding$s"
+    s"$padding$s"//left for evaluated values
   }
-
+  //pad a string to the right
   private def padRight(s: String, width: Int): String = {
     val padding = " " * (width - s.length)
-    s"$s$padding"
+    s"$s$padding"//right for headers
   }
 
-  override def print(table: TableInterface): String = {
-    val lastRow = table.lastRow.getOrElse(0)
-    val lastColumn = table.lastColumn.getOrElse(0)
+  override def print(
+                      table: TableInterface,
+                      range: Option[(ParseTableCells, ParseTableCells)],
+                      filter: Option[TableFilter],
+                      includeHeaders: Boolean
+                    ): String = {
 
-    if (lastRow == 0 || lastColumn == 0) return ""
+    val tableRange = new TableRange(table)
+    val tableFilterEvaluator = new TableFilterEvaluator(table)
 
-    // Calculate the maximum width of each column
-    val colWidths = (1 to lastColumn).map { colIndex =>
+    //determine effective range: full table if None
+    val effectiveRange = range.getOrElse {
+      val maxRow = table.lastRow.getOrElse(1)
+      val maxCol = table.lastColumn.getOrElse(1)
+      (ParseTableCells(1, 1), ParseTableCells(maxRow, maxCol))
+    }
+
+    //get cells within the specified or default range
+    val cellsInRange = tableRange.getRange(effectiveRange._1, effectiveRange._2)
+
+    //apply filter if provided, otherwise include all rows
+    val filteredRows = filter match {
+      case Some(f) =>
+        val filterResults = tableFilterEvaluator.evaluateFilter(f)
+        val matchingRowIndices = filterResults.zipWithIndex.collect {
+          case (true, idx) => idx + 1 //row indices are 1-based
+        }.toSet
+        cellsInRange.groupBy(_._1.row).filter { case (rowIndex, _) => matchingRowIndices.contains(rowIndex) }
+      case None => cellsInRange.groupBy(_._1.row)
+    }
+    if (filteredRows.isEmpty) return "" //early exit if no data rows are available
+
+    //determine columns to print based on cells in range
+    val cols = cellsInRange.keys.map(_.col).toList.distinct.sorted
+
+    //calculate the maximum width of each column to align properly
+    val colWidths = cols.map { colIndex =>
       val headerWidth = if (includeHeaders) ParseTableCells.getColName(colIndex).length else 0
-      val cellWidths = (1 to lastRow).map { rowIndex =>
+      val cellWidths = filteredRows.keys.flatMap { rowIndex =>
         val cellPos = ParseTableCells(rowIndex, colIndex)
-        table.getEvaluatedResultAsString(cellPos).length
-      }
+        Some(table.getEvaluatedResultAsString(cellPos).length)
+      }.toSeq
       (headerWidth +: cellWidths).max
     }
 
-    // Calculate the row number column width
-    val rowNumWidth = if (includeHeaders) lastRow.toString.length else 0
+    //calculate the row number column width
+    val rowNumWidth = if (includeHeaders) filteredRows.keys.maxOption.map(_.toString.length).getOrElse(0) else 0
 
-    // Create the header row
+    //create the Header Row if `includeHeaders` is true
     val headerRow = {
       val headers = if (includeHeaders) {
-        (Seq(padLeft("", rowNumWidth)) ++ (1 to lastColumn).zip(colWidths).map {
+        (Seq(padLeft("", rowNumWidth)) ++ cols.zip(colWidths).map {
           case (colIndex, width) =>
             padLeft(ParseTableCells.getColName(colIndex), width)
         }).mkString("| ", " | ", " |")
@@ -48,7 +79,7 @@ class MarkdownPrettyPrinter(includeHeaders: Boolean) extends PrettyPrinter {
       headers
     }
 
-    // Create the separator row
+    //create the Separator Row if `includeHeaders` is true
     val separatorRow = {
       val separators = if (includeHeaders) {
         (Seq("-" * (rowNumWidth + 2)) ++ colWidths.map { width =>
@@ -60,24 +91,19 @@ class MarkdownPrettyPrinter(includeHeaders: Boolean) extends PrettyPrinter {
       separators
     }
 
-    // Create data rows
-    val dataRows = (1 to lastRow).map { rowIndex =>
-      val rowCells = (1 to lastColumn).zip(colWidths).map {
-        case (colIndex, width) =>
-          val cellValue = table.getEvaluatedResultAsString(ParseTableCells(rowIndex, colIndex))
-          padRight(cellValue, width)
+    //build Data Rows with or without row indices
+    val dataRows = filteredRows.toSeq.sortBy(_._1).map { case (rowIndex, _) =>
+      val rowNumber = if (includeHeaders) padLeft(rowIndex.toString, rowNumWidth) else ""
+      val rowValues = cols.zip(colWidths).map { case (colIndex, width) =>
+        val cellPos = ParseTableCells(rowIndex, colIndex)
+        padRight(table.getEvaluatedResultAsString(cellPos), width)
       }
-      if (includeHeaders) {
-        val rowNumber = padLeft(rowIndex.toString, rowNumWidth)
-        (Seq(rowNumber) ++ rowCells).mkString("| ", " | ", " |")
-      } else {
-        rowCells.mkString("| ", " | ", " |")
-      }
+      if (includeHeaders) (rowNumber +: rowValues).mkString("| ", " | ", " |")
+      else rowValues.mkString("| ", " | ", " |")
     }
 
-    // Combine all parts
-    val outputLines = Seq(headerRow, separatorRow) ++ dataRows
-
-    outputLines.mkString("\n")
+    //combine Header, Separator, and Data Rows
+    val allRows = Seq(headerRow, separatorRow) ++ dataRows
+    allRows.mkString("\n")
   }
 }

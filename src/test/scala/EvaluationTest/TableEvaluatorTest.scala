@@ -69,7 +69,7 @@ class TableEvaluatorTest extends AnyFunSuite {
     evaluator.evaluateAllCellsAndStoreResults(table)
 
     // Check the evaluated results
-    assert(table.getEvaluatedResultAsString(ParseTableCells.parse("A1").get) == " ")
+    assert(table.getEvaluatedResultAsString(ParseTableCells.parse("A1").get) == "")
   }
 
   test("Circular dependency: Formula references itself") {
@@ -175,6 +175,6 @@ class TableEvaluatorTest extends AnyFunSuite {
     assert(table.getEvaluatedResultAsString(ParseTableCells.parse("A1").get) == "10")
     assert(table.getEvaluatedResultAsString(ParseTableCells.parse("B1").get) == "15")
     assert(table.getEvaluatedResultAsString(ParseTableCells.parse("A2").get) == "7.5")
-    assert(table.getEvaluatedResultAsString(ParseTableCells.parse("B2").get) == " ")
+    assert(table.getEvaluatedResultAsString(ParseTableCells.parse("B2").get) == "")
   }
 }

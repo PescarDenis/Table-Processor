@@ -17,10 +17,17 @@ class FilterTest extends AnyFunSuite {
   )
   val table= new MockTableForTests(data)
   val evaluator = new TableFilterEvaluator(table)
-  test("Filter rows where column B <= 30 with mixed types") {
+  test("Filter rows where column B <= 30") {
     val valueFilter = ValueFilter("B", "<=", 30)
     val results = evaluator.evaluateFilter(valueFilter)
     val expectedResults = List(true, true, false, false)
+    assert(results == expectedResults)
+  }
+
+  test("Filter rows where column A == 30") {
+    val valueFilter = ValueFilter("A", "!=", 30)
+    val results = evaluator.evaluateFilter(valueFilter)
+    val expectedResults = List(true, true, false, true)
     assert(results == expectedResults)
   }
 
@@ -44,6 +51,22 @@ class FilterTest extends AnyFunSuite {
 
     // Expected output: Only rows meeting both conditions
     val expectedResults = List(false, true, false, false) // Row 2 matches both conditions
+    assert(results == expectedResults)
+  }
+  test("Filter rows with --filter-is-empty B and --filter A < 25") {
+    // Define filters
+    val isEmptyFilterB = EmptyCellFilter("B", isEmpty = true)
+    val valueFilterA = ValueFilter("A", "<", 25.0)
+
+    // Chain filters with logical AND
+    val chainedFilter = ChainedFilter(List(isEmptyFilterB, valueFilterA))
+
+    // Apply filters with evaluator
+    val evaluator = new TableFilterEvaluator(table)
+    val results = evaluator.evaluateFilter(chainedFilter)
+
+    // Expected output: Only rows meeting both conditions
+    val expectedResults = List(false, false, false, false) //none of the rows match both conditions
     assert(results == expectedResults)
   }
 }

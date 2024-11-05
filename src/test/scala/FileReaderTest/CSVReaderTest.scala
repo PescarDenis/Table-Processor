@@ -1,4 +1,4 @@
-package File_Reader_Test
+package FileReaderTest
 
 import File_Reader.{CSVReader, CSVSeparator}
 import scala.io.Source

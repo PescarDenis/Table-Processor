@@ -1,6 +1,6 @@
 package Filters
 import Evaluation.EvaluationTypes.EvaluationResult
-import Table.{DefinedTabels, ParseTableCells}
+import Table.ParseTableCells
 
 ///This filter allows combining multiple filters. It only passes rows that match all the filters in the list (logical AND).
 case class ChainedFilter(filters: List[TableFilter]) extends TableFilter {

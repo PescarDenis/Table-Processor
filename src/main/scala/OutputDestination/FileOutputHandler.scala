@@ -10,5 +10,6 @@ class FileOutputHandler(filepath : String) extends OutputHandler {
       }finally{
         writer.close() //close the file regarding if we occur an error
       }
+       println(s"Output written to file: $filepath")
   }
 }

@@ -2,7 +2,6 @@ package ExpressionAST
 import Evaluation.EvaluationTypes.{EvaluationResult, IntResult,EmptyResult}
 import Table.ParseTableCells
 import Table.TableEntries.{Formula, Number, Empty}
-import Evaluation.EvaluationError
 // Case class for the reference cells
 case class CellReferenceExpression[T](cell: ParseTableCells) extends Expression[T] {
 

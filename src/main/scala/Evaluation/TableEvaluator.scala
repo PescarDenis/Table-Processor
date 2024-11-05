@@ -29,7 +29,7 @@ class TableEvaluator(context: EvaluationContext) {
         throw new IllegalArgumentException(s"Invalid reference: $cell is not a valid reference")
     }
     table.storeEvaluatedResult(cell, result)
-    result
+    result //return the evalauted result 
   }
 
   // Method to evaluate all cells and store the results in the table

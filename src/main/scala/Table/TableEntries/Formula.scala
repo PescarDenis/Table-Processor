@@ -7,7 +7,7 @@ import Table.ParseTableCells
 // Formula class for handling either formulas (e.g., =10*2) or raw implementations like 20*3
 class Formula(row: Int, col: Int) extends TableEntry(row, col) {
 
-  private var expression: Option[Expression[_]] = None // Store the parsed Expression
+  private var expression: Option[Expression[_]] = None //store the parsed Expression
 
   override def get: String = expression.map(_.toString).getOrElse("")
 

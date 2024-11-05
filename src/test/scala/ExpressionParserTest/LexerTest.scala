@@ -3,6 +3,7 @@ package ExpressionParserTest
 import org.scalatest.funsuite.AnyFunSuite
 import ExpressionParser.{LeftParenthesis, Lexer, NumberToken, OperatorToken, RefToken, RightParenthesis, Tokens}
 
+//Lexer testing
 class LexerTest extends AnyFunSuite{
 
   test("test1"){

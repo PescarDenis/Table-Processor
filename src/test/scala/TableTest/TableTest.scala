@@ -5,7 +5,6 @@ import Table.ParseTableCells
 import File_Reader.MockCSVReader
 import ExpressionAST.{AddExpression, ConstantExpression,CellReferenceExpression}
 import Evaluation.EvaluationTypes.IntResult
-import Evaluation.EvaluationError
 import Table.DefinedTabels.BaseTable
 
 class TableTest extends AnyFunSuite {

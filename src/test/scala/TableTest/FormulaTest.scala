@@ -1,7 +1,6 @@
 package TableTest
 
 import Evaluation.EvaluationTypes.{FloatResult, IntResult, EmptyResult}
-import Evaluation.EvaluationError
 import org.scalatest.funsuite.AnyFunSuite
 import Table.ParseTableCells
 import Table.TableEntries.{Formula, Number, Empty}

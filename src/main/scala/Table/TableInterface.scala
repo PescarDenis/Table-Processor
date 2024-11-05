@@ -2,7 +2,8 @@ package Table
 
 import Evaluation.EvaluationTypes.EvaluationResult
 import Table.TableEntries.TableEntry
-
+import File_Reader.CSVReader
+//An interface for a table with multiple methods for accessing different configurations
 trait TableInterface {
   // Retrieve a raw TableEntry (e.g., Number, Formula, or Empty) at a specific position
   def getCell(pos: ParseTableCells): TableEntry
@@ -29,7 +30,7 @@ trait TableInterface {
   def getEvaluatedResultAsString(pos: ParseTableCells): String
 
   // Parse the CSV data into the table
-  def parse(csvReader: File_Reader.CSVReader): TableInterface
+  def parse(csvReader: CSVReader): TableInterface
 
 }
 
