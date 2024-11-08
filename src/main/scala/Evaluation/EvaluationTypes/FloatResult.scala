@@ -2,7 +2,6 @@ package Evaluation.EvaluationTypes
 
 //simple case class to store the floated evaluated results
 case class FloatResult(value: Double) extends EvaluationResult[Double] {
-  override def toInt: Option[Int] = Some(value.toInt)
-  override def toFloat: Option[Double] = Some(value)
-  override def isEmpty: Boolean = false
+  override def toValue: Option[Double] = Some(value) // Provides the Double value
+  override def isEmpty: Boolean = false              // FloatResult is never empty
 }
