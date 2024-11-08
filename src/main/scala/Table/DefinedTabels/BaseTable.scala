@@ -1,6 +1,8 @@
 package Table.DefinedTabels
 
-import Evaluation.EvaluationTypes.{EvaluationResult, FloatResult, IntResult, EmptyResult}
+import Evaluation.EvaluationTypes.{EmptyResult, EvaluationResult, FloatResult, IntResult}
+import ExpressionParser.ParserLogic.ExpressionBuilder
+import ExpressionParser.ParsingServices.DefaultParsingService
 import File_Reader.CSVReader
 import Table.{ParseTableCells, TableInterface}
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
@@ -10,9 +12,9 @@ class BaseTable extends TableInterface {
   private var rows: Map[ParseTableCells, TableEntry] = Map() //store the table entries, mapped from cell positions to entries
   private var evaluatedResults: Map[ParseTableCells, EvaluationResult[_]] = Map()
   //store evaluated result of the table
-
+  private var parsingService = new DefaultParsingService(new ExpressionBuilder)
   def getTable: Map[ParseTableCells, TableEntry] = rows //getter for the internal row map
-  
+
   override def getCell(pos: ParseTableCells): TableEntry = {
     rows.getOrElse(pos, Empty(pos.row, pos.col))
   } //retrive the entry at agiven pos
@@ -20,7 +22,7 @@ class BaseTable extends TableInterface {
   override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[_]] = {
     evaluatedResults.filter { case (cell, _) => cell.row == rowIndex }
   } //get the evaluated resuluts for a specific row
-  
+
   override def lastRow: Option[Int] = {
     if (rows.isEmpty) None else rows.keys.map(_.row).maxOption
   } //retrive the last row
@@ -31,7 +33,7 @@ class BaseTable extends TableInterface {
 
   override def nonEmptyPositions: Iterable[ParseTableCells] = rows.keys
   //return all cell positions that have some entires
-  
+
   override def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[_]): Unit = {
     evaluatedResults += (pos -> result)
   }//store the evaluated results
@@ -65,7 +67,7 @@ class BaseTable extends TableInterface {
     if (cellValue.trim.isEmpty) {
       Empty(rowIndex, colIndex)
     } else if (cellValue.startsWith("=") || cellValue.matches(".*[+\\-*/].*")) {
-      val formulaEntry = new Formula(rowIndex, colIndex)
+      val formulaEntry = new Formula(rowIndex, colIndex,parsingService)
       formulaEntry.set(cellValue)
       formulaEntry
     } else {

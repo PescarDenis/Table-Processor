@@ -17,7 +17,7 @@ case class CellReferenceExpression[T](cell: ParseTableCells) extends Expression[
       case numberEntry: Number =>
         IntResult(numberEntry.numberValue.getOrElse(throw new IllegalArgumentException(s"Cell $cell is empty"))).asInstanceOf[EvaluationResult[T]]
       // If it is a number, get the number value. It will always be an int
-      case formulaEntry: Formula =>
+      case formulaEntry: Formula[T] =>
         formulaEntry.evaluate(context, updatedVisited).asInstanceOf[EvaluationResult[T]]
       // If it is a formula, evaluate it and return the result
 

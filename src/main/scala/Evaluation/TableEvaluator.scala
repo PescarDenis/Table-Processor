@@ -13,7 +13,7 @@ class TableEvaluator(context: EvaluationContext) {
   def evaluateCellAndStore[T](cell: ParseTableCells, visited: Set[ParseTableCells] = Set.empty, table: BaseTable): EvaluationResult[T] = {
     // Evaluate the cell based on its type
     val result = context.lookup(cell) match {
-      case formula: Formula =>
+      case formula: Formula[T] =>
         formula.evaluate(context, visited).asInstanceOf[EvaluationResult[T]]
 
       case number: Number =>
