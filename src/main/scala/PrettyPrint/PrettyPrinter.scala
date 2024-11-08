@@ -1,5 +1,5 @@
 package PrettyPrint
-import Table.TableInterface
+import Table.TableInterfaces
 import Table.ParseTableCells
 import Filters.TableFilter
 ///base interface that allows the user to print the table in different formats

@@ -1,11 +1,10 @@
 package EvaluationTest
-import Evaluation.EvaluationTypes.{FloatResult, IntResult, EmptyResult}
+import Evaluation.EvaluationTypes.{EmptyResult, EvaluationError, FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
 import Table.TableEntries.{Empty, Formula, Number}
 import Table.ParseTableCells
 import Evaluation.TableEvaluator
 import ExpressionAST.EvaluationContext
-import Evaluation.EvaluationError
 import Table.DefinedTabels.BaseTable
 
 class TableEvaluatorTest extends AnyFunSuite {

@@ -1,6 +1,6 @@
 package PrettyPrint
 
-import Table.{ParseTableCells, TableInterface}
+import Table.{ParseTableCells, TableInterfaces}
 import File_Reader.CSVSeparator
 import Table.DefinedTabels._
 import Filters.TableFilter

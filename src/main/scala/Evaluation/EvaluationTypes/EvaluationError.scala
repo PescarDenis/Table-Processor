@@ -1,4 +1,5 @@
-package Evaluation
+package Evaluation.EvaluationTypes
+
 import Evaluation.EvaluationTypes.EvaluationResult
 //a class to help with printing a message when the evaluation goes wrong
 case class EvaluationError(message: String) extends EvaluationResult[Nothing] {

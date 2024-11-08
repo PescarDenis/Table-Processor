@@ -1,5 +1,5 @@
 package PrettyPrint
-import Table.TableInterface
+import Table.TableInterfaces
 import Filters.TableFilter
 import Table.ParseTableCells
 import OutputDestination.OutputHandler

@@ -1,6 +1,6 @@
 package Table.DefinedTabels
 
-import Table.{ParseTableCells, TableInterface}
+import Table.{ParseTableCells, TableInterfaces}
 import Evaluation.EvaluationTypes.{EmptyResult, EvaluationResult}
 //retrieves a specific cell range
 class TableRange(table: TableInterface) {

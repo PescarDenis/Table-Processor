@@ -1,6 +1,6 @@
 package PrettyPrint
 
-import Table.{ParseTableCells, TableInterface}
+import Table.{ParseTableCells, TableInterfaces}
 import Table.DefinedTabels.{TableRange, TableFilterEvaluator}
 import Filters.TableFilter
 

@@ -1,7 +1,7 @@
 package Table.DefinedTabels
 
 import Filters.TableFilter
-import Table.TableInterface
+import Table.TableInterfaces
 //evaluate the filters of a table
 class TableFilterEvaluator(table: TableInterface) {
   //evaluates a specified filter against all rows in the table
