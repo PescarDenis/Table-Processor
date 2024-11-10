@@ -1,13 +1,15 @@
 package PrettyPrint
 
+import Evaluation.EvaluationTypes.EvaluationResult
 import Table.{ParseTableCells, TableInterfaces}
 import File_Reader.CSVSeparator
-import Table.DefinedTabels._
+import Table.DefinedTabels.*
 import Filters.TableFilter
+import Table.TableInterfaces.EvaluatedTableInterface
 //CSV printer class -> knows how to print the table in the CSV format
 class CSVPrettyPrinter(separator: CSVSeparator) extends PrettyPrinter {
   override def print(
-                      table: TableInterface,
+                      table: EvaluatedTableInterface[EvaluationResult[_]],
                       range: Option[(ParseTableCells, ParseTableCells)],
                       filter: Option[TableFilter],
                       includeHeaders: Boolean

@@ -3,8 +3,10 @@ package Main
 import ProcessingModules._
 import CLIInterface._
 import PrettyPrint._
-import scala.io.StdIn
 import Table.DefinedTabels.BaseTable
+import Table.TableInterfaces.{RawTableInterface, EvaluatedTableInterface}
+import Evaluation.TableEvaluator
+import scala.io.StdIn
 
 object Main {
   def printWelcomeMessage(): Unit = {
@@ -15,13 +17,10 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    // Register PrettyPrinters
     PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
     PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
 
     val cli = new CLI()
-
-    // Show welcome message and enter command loop
     printWelcomeMessage()
     var running = true
 
@@ -47,7 +46,7 @@ object Main {
               }
             case Some(_) =>
               println("Error: --input-file is required. Exiting program.")
-              sys.exit(1) // Exit immediately if input file is not provided
+              sys.exit(1)
             case None =>
               println("Invalid input or configuration. Please try again.")
           }
@@ -56,32 +55,38 @@ object Main {
   }
 
   private def processWorkflow(config: CLIConfig): Unit = {
-    val table = loadTable(config)
-    evaluateTable(table)
-    applyFilters(config, table)
-    val selectedTable = selectRange(config, table)
+    val (rawTable, evaluatedTable) = loadTable(config)
+    evaluateTable(rawTable, evaluatedTable)
+    applyFilters(config, evaluatedTable)
+    val selectedTable = selectRange(config, evaluatedTable)
     outputTable(config, selectedTable)
   }
 
-  private def loadTable(config: CLIConfig): BaseTable = {
+  private def loadTable(config: CLIConfig): (RawTableInterface[TableEntry], EvaluatedTableInterface[EvaluationResult[_]]) = {
     println("\nLoading table...")
     val inputLoader = new InputLoader(config)
-    val table = inputLoader.loadTable()
+    val table = inputLoader.loadTable() // Returns a BaseTable implementing both interfaces
     println("Table loaded successfully.")
-    table
+    (table, table)
   }
 
-  private def evaluateTable(table: BaseTable): Unit = {
+  private def evaluateTable(
+                             rawTable: RawTableInterface[TableEntry],
+                             evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
+                           ): Unit = {
     println("\nEvaluating formulas...")
-    val evaluator = new Evaluator(table)
-    evaluator.evaluateAll()
+    val tableEvaluator = new TableEvaluator(new EvaluationContext(rawTable))
+    tableEvaluator.evaluateAllCellsAndStoreResults(evaluatedTable)
     println("Formulas evaluated successfully.")
   }
 
-  private def applyFilters(config: CLIConfig, table: BaseTable): Unit = {
+  private def applyFilters(
+                            config: CLIConfig,
+                            evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
+                          ): Unit = {
     if (config.filters.nonEmpty) {
       println("\nApplying filters...")
-      val filtering = new Filtering(config, table)
+      val filtering = new Filtering(config, evaluatedTable)
       filtering.applyFilters()
       println("Filters applied successfully.")
     } else {
@@ -89,21 +94,27 @@ object Main {
     }
   }
 
-  private def selectRange(config: CLIConfig, table: BaseTable): BaseTable = {
+  private def selectRange(
+                           config: CLIConfig,
+                           evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
+                         ): EvaluatedTableInterface[EvaluationResult[_]] = {
     config.range match {
       case Some((start, end)) =>
         println(s"\nSelecting range from $start to $end...")
-        val rangeSelector = new RangeSelector(config, table)
+        val rangeSelector = new RangeSelector(config, evaluatedTable)
         rangeSelector.selectRange()
       case None =>
         println("\nNo range specified. Using the entire table.")
-        table
+        evaluatedTable
     }
   }
 
-  private def outputTable(config: CLIConfig, table: BaseTable): Unit = {
+  private def outputTable(
+                           config: CLIConfig,
+                           evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
+                         ): Unit = {
     println("\nOutputting table...")
-    val tableOutput = new TableOutput(config, table)
+    val tableOutput = new TableOutput(config, evaluatedTable)
     tableOutput.output()
     println("Table output completed.")
   }

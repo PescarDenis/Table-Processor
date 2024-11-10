@@ -1,13 +1,13 @@
 package Table.DefinedTabels
 
 import Table.{ParseTableCells, TableInterfaces}
+import Table.TableInterfaces.EvaluatedTableInterface
 import Evaluation.EvaluationTypes.{EmptyResult, EvaluationResult}
-//retrieves a specific cell range
-class TableRange(table: TableInterface) {
 
-  //getter for the range ->returns a map of evaluated cells
+class TableRange(evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]) {
+
+  // Get a range of evaluated cells as a Map[ParseTableCells, EvaluationResult[_]]
   def getRange(from: ParseTableCells, to: ParseTableCells): Map[ParseTableCells, EvaluationResult[_]] = {
-    //determine the minimum and the maximum rows and columns for the specific range
     val startRow = from.row min to.row
     val endRow = from.row max to.row
     val startCol = from.col min to.col
@@ -16,13 +16,14 @@ class TableRange(table: TableInterface) {
     (for {
       row <- startRow to endRow
       col <- startCol to endCol
-      cellPos = ParseTableCells(row, col)  //create the cell position
-      result <- table.getEvaluatedResult(cellPos) //get the evaluation result for the cell
-    } yield cellPos -> result).toMap //map each cell pos to its result
+      cellPos = ParseTableCells(row, col)
+      result <- evaluatedTable.getEvaluatedResult(cellPos) // Fetch evaluated results
+    } yield cellPos -> result).toMap
   }
-  //returns a map of cell positions to evaluation results for all non-empty cells
+
+  // Get the default range of evaluated non-empty cells
   def getDefaultRange: Map[ParseTableCells, EvaluationResult[_]] = {
-    val nonEmptyPositions = table.nonEmptyPositions.toSeq
+    val nonEmptyPositions = evaluatedTable.nonEmptyPositions.toSeq
     val maxRow = nonEmptyPositions.map(_.row).maxOption.getOrElse(0)
     val maxCol = nonEmptyPositions.map(_.col).maxOption.getOrElse(0)
 
@@ -30,11 +31,11 @@ class TableRange(table: TableInterface) {
       row <- 1 to maxRow
       col <- 1 to maxCol
       cellPos = ParseTableCells(row, col)
-      result <- table.getEvaluatedResult(cellPos) if !result.isInstanceOf[EmptyResult.type]
+      result <- evaluatedTable.getEvaluatedResult(cellPos) if !result.isInstanceOf[EmptyResult.type]
     } yield cellPos -> result).toMap
   }
 
-  //print the evaluation results for a range of cells(used for testing purposes)
+  // Print the results of evaluated cells for testing
   def printRange(cells: Map[ParseTableCells, EvaluationResult[_]]): Unit = {
     val rows = cells.keys.map(_.row).maxOption.getOrElse(0)
     val cols = cells.keys.map(_.col).maxOption.getOrElse(0)
@@ -42,7 +43,7 @@ class TableRange(table: TableInterface) {
     for (r <- 1 to rows) {
       for (c <- 1 to cols) {
         val cellPos = ParseTableCells(r, c)
-        val value = table.getEvaluatedResultAsString(cellPos)
+        val value = evaluatedTable.getEvaluatedResultAsString(cellPos)
         print(s"$value\t")
       }
       println()

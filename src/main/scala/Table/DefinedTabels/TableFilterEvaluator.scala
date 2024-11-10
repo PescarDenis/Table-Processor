@@ -1,9 +1,10 @@
 package Table.DefinedTabels
 
 import Filters.TableFilter
-import Table.TableInterfaces
+import Table.TableInterfaces.EvaluatedTableInterface
+import Evaluation.EvaluationTypes.EvaluationResult
 //evaluate the filters of a table
-class TableFilterEvaluator(table: TableInterface) {
+class TableFilterEvaluator(table: EvaluatedTableInterface[EvaluationResult[_]]) {
   //evaluates a specified filter against all rows in the table
   def evaluateFilter(filter: TableFilter): List[Boolean] = {
     val lastRow = table.lastRow.getOrElse(0) //fetch the last row

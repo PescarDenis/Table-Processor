@@ -22,7 +22,7 @@ class BaseTable extends RawTableInterface[TableEntry] with EvaluatedTableInterfa
     if (rows.isEmpty) None else rows.keys.map(_.col).maxOption
 
   override def nonEmptyPositions: Iterable[ParseTableCells] =
-    rows.keys
+    evaluatedResults.keys.filter(pos => !evaluatedResults(pos).isInstanceOf[EmptyResult.type])
 
   override def addCell(pos: ParseTableCells, entry: TableEntry): Unit =
     rows += (pos -> entry) // Add or update a cell entry

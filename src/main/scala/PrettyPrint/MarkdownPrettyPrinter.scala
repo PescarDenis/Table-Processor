@@ -1,8 +1,10 @@
 package PrettyPrint
 
+import Evaluation.EvaluationTypes.EvaluationResult
 import Table.{ParseTableCells, TableInterfaces}
-import Table.DefinedTabels.{TableRange, TableFilterEvaluator}
+import Table.DefinedTabels.{TableFilterEvaluator, TableRange}
 import Filters.TableFilter
+import Table.TableInterfaces.EvaluatedTableInterface
 
 //Markdown printer class -> knows how to print the table in the MD format
 class MarkdownPrettyPrinter extends PrettyPrinter {
@@ -19,7 +21,7 @@ class MarkdownPrettyPrinter extends PrettyPrinter {
   }
 
   override def print(
-                      table: TableInterface,
+                      table: EvaluatedTableInterface[EvaluationResult[_]],
                       range: Option[(ParseTableCells, ParseTableCells)],
                       filter: Option[TableFilter],
                       includeHeaders: Boolean
