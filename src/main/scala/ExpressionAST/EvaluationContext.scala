@@ -2,15 +2,23 @@ package ExpressionAST
 
 import Table.ParseTableCells
 import Table.TableEntries.TableEntry
-import Table.TableEntries.Empty
-//component for evaluating expressions within the context of a table
-class EvaluationContext(table : Map[ParseTableCells,TableEntry] ){ ///the constructor parameter takes a map
-  // where the keys are the position of each cell and the TableEntry are the data in those cells
+import Table.TableInterfaces.RawTableInterface
+import Table.TableEntries.Formula
+import Evaluation.TableEvaluator
+class EvaluationContext(
+                         table: RawTableInterface[TableEntry],
+                         tableEvaluator: TableEvaluator
+                       ) {
 
-  def getTable: Map[ParseTableCells, TableEntry] = table //getter method to access  the table
-
-  def lookup(cell : ParseTableCells) : TableEntry ={
-    table.getOrElse(cell, Empty(cell.row,cell.col)) //if the cell does not exist in a map , it returns an instance of EmptyEntry
+  def lookup(cell: ParseTableCells): Expression[_] = {
+    table.getCell(cell) match {
+      case formula: Formula =>
+        formula.getExpression.getOrElse(
+          throw new IllegalArgumentException(s"No expression found in cell: $cell")
+        )
+    }
   }
 
+  def getTableEvaluator: TableEvaluator = tableEvaluator
 }
+

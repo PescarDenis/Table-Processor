@@ -1,4 +1,4 @@
-package Table.DefinedTables
+package Table.DefinedTabels
 
 import Table.ParseTableCells
 import Table.TableEntries.{TableEntry, Empty}
@@ -6,7 +6,7 @@ import Table.TableInterfaces.{EvaluatedTableInterface, RawTableInterface}
 import Evaluation.EvaluationTypes.{EvaluationResult, EmptyResult,IntResult,FloatResult,EvaluationError}
 
 
-class BaseTable extends RawTableInterface[_] with EvaluatedTableInterface[EvaluationResult[_]] {
+class BaseTable extends RawTableInterface[TableEntry] with EvaluatedTableInterface[EvaluationResult[_]] {
 
   private var rows: Map[ParseTableCells, TableEntry] = Map()
   private var evaluatedResults: Map[ParseTableCells, EvaluationResult[_]] = Map()
@@ -24,6 +24,8 @@ class BaseTable extends RawTableInterface[_] with EvaluatedTableInterface[Evalua
   override def nonEmptyPositions: Iterable[ParseTableCells] =
     rows.keys
 
+  override def addCell(pos: ParseTableCells, entry: TableEntry): Unit =
+    rows += (pos -> entry) // Add or update a cell entry
   // EvaluatedTableInterface methods
   override def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[_]): Unit =
     evaluatedResults += (pos -> result)
@@ -32,13 +34,12 @@ class BaseTable extends RawTableInterface[_] with EvaluatedTableInterface[Evalua
     evaluatedResults.get(pos)
 
   override def getEvaluatedResultAsString(pos: ParseTableCells): String =
-    evaluatedResults.get(pos).map {
-      case IntResult(value) => value.toString
-      case FloatResult(value) => value.toString
-      case EmptyResult => ""
-      case EvaluationError(message) => s"ERROR: $message"
-      case _ => "UNKNOWN RESULT"
-    }.getOrElse(" ")
+    evaluatedResults.get(pos) match {
+      case Some(IntResult(value)) => value.toString
+      case Some(FloatResult(value)) => value.toString
+      case Some(EmptyResult) => ""
+      case Some(EvaluationError(message)) => s"ERROR: $message"
+    }
 
   override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[_]] =
     evaluatedResults.filter { case (cell, _) => cell.row == rowIndex }

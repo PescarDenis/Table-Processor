@@ -1,41 +1,56 @@
 package Evaluation
 
-import Evaluation.EvaluationTypes.{EvaluationResult, IntResult, EmptyResult,FloatResult}
+import Evaluation.EvaluationTypes._
 import Table.ParseTableCells
-import Table.TableEntries.{Empty, Formula, Number, TableEntry}
-import ExpressionAST.{EvaluationContext, Expression}
-import Table.DefinedTabels.BaseTable
+import Table.TableEntries._
+import Table.TableInterfaces.{EvaluatedTableInterface, RawTableInterface}
+import ExpressionAST.EvaluationContext
 
-// Base class to evaluate the table
-class TableEvaluator(context: EvaluationContext) {
 
-  // Method to evaluate a single cell and store the result in the table
-  def evaluateCellAndStore[T](cell: ParseTableCells, visited: Set[ParseTableCells] = Set.empty, table: BaseTable): EvaluationResult[T] = {
-    // Evaluate the cell based on its type
-    val result = context.lookup(cell) match {
-      case formula: Formula[T] =>
-        formula.evaluate(context, visited).asInstanceOf[EvaluationResult[T]]
+class TableEvaluator(
+                      context: EvaluationContext,
+                      private val formulaEvaluator: FormulaEvaluator
+                    ) {
 
+  // Evaluates a single cell and stores the result
+  def evaluateCellAndStore(
+                            pos: ParseTableCells,
+                            visited: Set[ParseTableCells],
+                            rawTable: RawTableInterface[TableEntry],
+                            evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
+                          ): EvaluationResult[_] = {
+
+    rawTable.getCell(pos) match {
       case number: Number =>
-        number.numberValue match {
-          case Some(value) => IntResult(value).asInstanceOf[EvaluationResult[T]]
-          case None => EmptyResult.asInstanceOf[EvaluationResult[T]] // Return EmptyResult for an empty number cell
-        }
+        val result = IntResult(number.numberValue.getOrElse(0))
+        evaluatedTable.storeEvaluatedResult(pos, result)
+        result
 
-      case empty: Empty =>
-        EmptyResult.asInstanceOf[EvaluationResult[T]] // Return EmptyResult for a plain reference to an empty cell
+      case _: Empty =>
+        val result = EmptyResult
+        evaluatedTable.storeEvaluatedResult(pos, result)
+        result
+
+      case formula: Formula =>
+        // Delegate formula evaluation to FormulaEvaluator
+        val result = formulaEvaluator.evaluateFormula(formula, context, visited)
+        evaluatedTable.storeEvaluatedResult(pos, result)
+        result
 
       case _ =>
-        throw new IllegalArgumentException(s"Invalid reference: $cell is not a valid reference")
+        val error = EvaluationError(s"Invalid entry at $pos")
+        evaluatedTable.storeEvaluatedResult(pos, error)
+        error
     }
-    table.storeEvaluatedResult(cell, result)
-    result //return the evalauted result 
   }
 
-  // Method to evaluate all cells and store the results in the table
-  def evaluateAllCellsAndStoreResults(table: BaseTable): Unit = {
-    context.getTable.keys.foreach { cellPos =>
-      evaluateCellAndStore[Any](cellPos, Set.empty, table) // Evaluate and store each cell's result as EvaluationResult
+  // Evaluates all cells in the table
+  def evaluateAllCellsAndStoreResults(
+                                       rawTable: RawTableInterface[TableEntry],
+                                       evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
+                                     ): Unit = {
+    rawTable.nonEmptyPositions.foreach { pos =>
+      evaluateCellAndStore(pos, Set.empty, rawTable, evaluatedTable)
     }
   }
 }
