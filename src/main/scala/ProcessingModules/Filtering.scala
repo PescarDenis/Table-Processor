@@ -1,7 +1,8 @@
 package ProcessingModules
 
 import CLIInterface.CLIConfig
-import Table.DefinedTabels.{BaseTable, TableFilterEvaluator}
+import Filters.TableFilterEvaluator
+import Table.DefinedTabels.BaseTable
 
 //applies a set of filters from the CLIConfig to the table
 //each filter is evaluated and the results are applied to the table

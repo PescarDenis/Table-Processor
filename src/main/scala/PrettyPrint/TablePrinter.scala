@@ -1,21 +1,19 @@
 package PrettyPrint
-import Table.TableInterfaces
+import Table.TableInterface
 import Filters.TableFilter
-import Table.ParseTableCells
 import OutputDestination.OutputHandler
-import Table.TableInterfaces.EvaluatedTableInterface
-import Evaluation.EvaluationTypes.EvaluationResult
-//Classs that prints the table
-//parametrize it over prettyprinter
-class TablePrinter[T <: PrettyPrinter](printer : T) {
+import TableParser.ParseTableCells
+
+//Classs that prints the table 
+class TablePrinter(prettyPrinter: PrettyPrinter) {
   def printTable(
-                  table: EvaluatedTableInterface[EvaluationResult[_]],
+                  table: TableInterface,
                   outputHandler: OutputHandler,
                   range: Option[(ParseTableCells, ParseTableCells)],
                   filter: Option[TableFilter],
                   includeHeaders: Boolean
                 ): Unit = {
-    val content = printer.print(table, range, filter, includeHeaders)
+    val content = prettyPrinter.print(table, range, filter, includeHeaders)
     outputHandler.write(content)
   }
 }

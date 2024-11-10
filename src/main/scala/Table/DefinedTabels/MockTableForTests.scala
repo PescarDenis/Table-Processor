@@ -1,13 +1,19 @@
 package Table.DefinedTabels
 
-import Evaluation.EvaluationTypes._
-import Table.ParseTableCells
+import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
+import Evaluation.EvaluationResult
+import TableParser.{FileParser, ParseTableCells}
+import ExpressionParser.ParserLogic.*
+import ExpressionParser.ParsingServices.DefaultExpressionParser
 
-//just a moktable for testing purposes
-class MockTableForTests(initialData: Map[ParseTableCells, EvaluationResult[_]]) extends BaseTable {
-  protected var evaluatedResults: Map[ParseTableCells, EvaluationResult[_]] = initialData
+class MockTableForTests(
+                         initialData: Map[ParseTableCells, EvaluationResult[?]]
+                       ) extends BaseTable(new FileParser(new DefaultExpressionParser(new ExpressionBuilder))) {
 
-  override def getEvaluatedResult(cell: ParseTableCells): Option[EvaluationResult[_]] = {
+
+  protected var evaluatedResults: Map[ParseTableCells, EvaluationResult[?]] = initialData
+
+  override def getEvaluatedResult(cell: ParseTableCells): Option[EvaluationResult[?]] = {
     evaluatedResults.get(cell)
   }
 
@@ -19,8 +25,14 @@ class MockTableForTests(initialData: Map[ParseTableCells, EvaluationResult[_]]) 
     if (evaluatedResults.isEmpty) None else evaluatedResults.keys.map(_.col).maxOption
   }
 
-  override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[_]] = {
+  override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[?]] = {
     evaluatedResults.filter { case (cell, _) => cell.row == rowIndex }
+  }
+
+  override def nonEmptyPositions: Iterable[ParseTableCells] = {
+    evaluatedResults.collect {
+      case (pos, result) if !result.isInstanceOf[EmptyResult.type] => pos
+    }.toList
   }
 
   override def getEvaluatedResultAsString(pos: ParseTableCells): String = {

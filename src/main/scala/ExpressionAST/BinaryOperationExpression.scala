@@ -1,7 +1,7 @@
 package ExpressionAST
 
-import Evaluation.EvaluationTypes.EvaluationResult
-import Table.ParseTableCells
+import Evaluation.EvaluationResult
+import TableParser.ParseTableCells
 
 // Abstract class for binary operations like +, -, *, /
 abstract class BinaryOperationExpression[T](left: Expression[T], right: Expression[T]) extends Expression[T] {

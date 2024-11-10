@@ -1,29 +1,34 @@
 package Table.TableEntries
 
-import Evaluation.EvaluationTypes._
+import Evaluation.EvaluationResult
 import ExpressionAST.{Expression, EvaluationContext}
-import ExpressionParser.ParsingServices._
-import Table.ParseTableCells
+import ExpressionParser.ParsingServices.ExpressionParser
+import TableParser.ParseTableCells
 
-class Formula(row: Int, col: Int, parsingService: ParsingService[_]) extends TableEntry(row, col) {
 
-  // Properly initialized to None to indicate no expression has been set yet
-  private var expression: Option[Expression[_]] = None
+case class Formula(row: Int, col: Int, parser: ExpressionParser) extends TableEntry {
 
-  // Get a string representation of the current expression or empty string if none is set
+  private var expression: Option[Expression[?]] = None // Store the parsed Expression
+
   override def get: String = expression.map(_.toString).getOrElse("")
 
-  // Parse and set the raw formula value into an expression
   override def set(value: String): Unit = {
-    val exprStr = if (value.startsWith("=")) value.substring(1).trim else value.trim
-    expression = Some(parsingService.parseExpression(exprStr)) // Store parsed expression
+    if (value.startsWith("=")) {
+      val expressionStr = value.substring(1).trim
+      // Parse the string into an expression using a parser
+      expression = Some(parser.parseExpression(expressionStr))
+    } else {
+      expression = Some(parser.parseExpression(value)) // Parse the raw expression, for instance 10*25
+    }
   }
-
-  // Checks if no expression has been set
+  
   override def isEmpty: Boolean = expression.isEmpty
 
-  // Returns the current expression, if any
-  def getExpression: Option[Expression[_]] = expression
-
-  def cellPosition: ParseTableCells = ParseTableCells(row, col)
+  // Evaluate the stored expression
+  override def evaluate(context: EvaluationContext, visited: Set[ParseTableCells]): EvaluationResult[?] = {
+    expression match {
+      case Some(expr) => expr.evaluate(context, visited) // Call evaluate on the contained expression
+      case None => throw new IllegalStateException(s"No expression set for cell: (${row}, ${col})")
+    }
+  }
 }

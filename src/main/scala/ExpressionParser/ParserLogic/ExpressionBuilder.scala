@@ -1,9 +1,9 @@
 package ExpressionParser.ParserLogic
 
-
-import Evaluation.EvaluationTypes.{EvaluationResult, FloatResult, IntResult}
+import Evaluation.EvaluationTypes.{FloatResult, IntResult}
+import Evaluation.EvaluationResult
 import ExpressionAST.*
-import Table.ParseTableCells
+import TableParser.ParseTableCells
 
 // ExpressionBuilder class -> used to construct different types of expressions
 class ExpressionBuilder[T] extends ExpressionBuilderInterface[T] {

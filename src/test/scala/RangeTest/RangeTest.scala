@@ -1,87 +1,110 @@
 package RangeTest
 
+import Evaluation.EvaluationResult
 import org.scalatest.funsuite.AnyFunSuite
-import Table.ParseTableCells
-import Table.DefinedTabels.TableRange
-import Evaluation.EvaluationTypes._
+import Evaluation.EvaluationTypes.*
+import Range.TableRangeEvaluator
 import Table.DefinedTabels.MockTableForTests
+import TableParser.ParseTableCells
 
 class RangeTest extends AnyFunSuite {
-  val data = Map(
-    ParseTableCells(1, 1) -> IntResult(10), //A1
-    ParseTableCells(1, 2) -> IntResult(22), // B1
-    ParseTableCells(2, 1) -> FloatResult(20.5), //A2
-    ParseTableCells(2, 2) -> FloatResult(14.5), // B2
-    ParseTableCells(3, 1) -> IntResult(30), //A3
-    ParseTableCells(3, 2) -> EmptyResult, // B3
-    ParseTableCells(4, 1) -> FloatResult(40.2), //A4
-    ParseTableCells(4, 2) -> EmptyResult // B4
-  )
-  val mockTable = new MockTableForTests(data)
-  val tableRange = new TableRange(mockTable)
-  test("Range selection from A1 to B3") {
 
-    // Define the expected result map for the range A1 to B3
+  // Mock data to simulate table with evaluated results
+  val data: Map[ParseTableCells, EvaluationResult[Any]] = Map(
+    ParseTableCells(1, 1) -> IntResult(10),   // A1
+    ParseTableCells(1, 2) -> IntResult(22),   // B1
+    ParseTableCells(2, 1) -> FloatResult(20.5), // A2
+    ParseTableCells(2, 2) -> FloatResult(14.5), // B2
+    ParseTableCells(3, 1) -> IntResult(30),   // A3
+    ParseTableCells(3, 2) -> EmptyResult,     // B3
+    ParseTableCells(4, 1) -> FloatResult(40.2), // A4
+    ParseTableCells(4, 2) -> EmptyResult      // B4
+  )
+
+  // Mock table implementation
+  val mockTable = new MockTableForTests(data)
+  val rangeEvaluator = new TableRangeEvaluator(mockTable)
+
+  test("Range selection from A1 to B3") {
     val expectedRange = Map(
-      ParseTableCells(1, 1) -> IntResult(10), // A1
-      ParseTableCells(1, 2) -> IntResult(22), // B1
+      ParseTableCells(1, 1) -> IntResult(10),   // A1
+      ParseTableCells(1, 2) -> IntResult(22),   // B1
       ParseTableCells(2, 1) -> FloatResult(20.5), // A2
       ParseTableCells(2, 2) -> FloatResult(14.5), // B2
-      ParseTableCells(3, 1) -> IntResult(30), // A3
-      ParseTableCells(3, 2) -> EmptyResult // B3 (empty cell)
+      ParseTableCells(3, 1) -> IntResult(30),   // A3
+      ParseTableCells(3, 2) -> EmptyResult      // B3
     )
 
-    // Get the actual range from A1 to B3
-    val range1 = tableRange.getRange(ParseTableCells(1, 1), ParseTableCells(3, 2))
-    val range2 = tableRange.getRange(ParseTableCells(3, 2), ParseTableCells(1, 1))
-    val range3 = tableRange.getRange(ParseTableCells(1, 2), ParseTableCells(3, 1))
-    val range4 = tableRange.getRange(ParseTableCells(3, 1), ParseTableCells(1, 2))
-
-    tableRange.printRange(range2)
-
-    assert(range1 == expectedRange)
-    assert(range2 == expectedRange)
-    assert(range3 == expectedRange)
-    assert(range4 == expectedRange)
+    val rangeResults = rangeEvaluator.getResultsInRange(ParseTableCells(1, 1), ParseTableCells(3, 2))
+    assert(rangeResults == expectedRange)
   }
 
   test("Range selection from A2 to B4") {
     val expectedRange = Map(
       ParseTableCells(2, 1) -> FloatResult(20.5), // A2
       ParseTableCells(2, 2) -> FloatResult(14.5), // B2
-      ParseTableCells(3, 1) -> IntResult(30), // A3
-      ParseTableCells(3, 2) -> EmptyResult, // B3
+      ParseTableCells(3, 1) -> IntResult(30),   // A3
+      ParseTableCells(3, 2) -> EmptyResult,     // B3
       ParseTableCells(4, 1) -> FloatResult(40.2), // A4
-      ParseTableCells(4, 2) -> EmptyResult // B4
+      ParseTableCells(4, 2) -> EmptyResult      // B4
     )
 
-    val range1 = tableRange.getRange(ParseTableCells(2, 1), ParseTableCells(4, 2))
-    val range2 = tableRange.getRange(ParseTableCells(4, 1), ParseTableCells(2, 2))
-    val range3 = tableRange.getRange(ParseTableCells(4, 2), ParseTableCells(2, 1))
-    val range4 = tableRange.getRange(ParseTableCells(2, 2), ParseTableCells(4, 1))
-
-    tableRange.printRange(range1)
-
-    assert(range1 == expectedRange)
-    assert(range2 == expectedRange)
-    assert(range3 == expectedRange)
-    assert(range4 == expectedRange)
+    val rangeResults = rangeEvaluator.getResultsInRange(ParseTableCells(2, 1), ParseTableCells(4, 2))
+    assert(rangeResults == expectedRange)
   }
 
   test("Single row selection across all columns") {
     val expectedRange = Map(
-      ParseTableCells(3, 1) -> IntResult(30), // A3
-      ParseTableCells(3, 2) -> EmptyResult // B3
+      ParseTableCells(3, 1) -> IntResult(30),   // A3
+      ParseTableCells(3, 2) -> EmptyResult      // B3
     )
 
-    val range1 = tableRange.getRange(ParseTableCells(3, 1), ParseTableCells(3, 2))
-    val range2 = tableRange.getRange(ParseTableCells(3, 2), ParseTableCells(3, 1))
+    val rangeResults = rangeEvaluator.getResultsInRange(ParseTableCells(3, 1), ParseTableCells(3, 2))
+    assert(rangeResults == expectedRange)
+  }
 
+  test("Default range selection") {
+    val expectedRange = Map(
+      ParseTableCells(1, 1) -> IntResult(10),   // A1
+      ParseTableCells(1, 2) -> IntResult(22),   // B1
+      ParseTableCells(2, 1) -> FloatResult(20.5), // A2
+      ParseTableCells(2, 2) -> FloatResult(14.5), // B2
+      ParseTableCells(3, 1) -> IntResult(30),   // A3
+      ParseTableCells(3, 2) -> EmptyResult,     // B3
+      ParseTableCells(4, 1) -> FloatResult(40.2), //A4
+      ParseTableCells(4, 2) -> EmptyResult //B4
+    )
 
-    tableRange.printRange(range1)
+    val defaultRangeResults = rangeEvaluator.getDefaultRangeResults
+    assert(defaultRangeResults == expectedRange)
+  }
+  test("Default range strips empty rows and columns") {
+    val data: Map[ParseTableCells, EvaluationResult[Any]] = Map(
+      ParseTableCells(1, 1) -> IntResult(10), // A1
+      ParseTableCells(1, 2) -> IntResult(22), // B1
+      ParseTableCells(2, 1) -> FloatResult(20.5), // A2
+      ParseTableCells(2, 2) -> FloatResult(14.5), // B2
+      ParseTableCells(3, 1) -> IntResult(30), // A3
+      ParseTableCells(3, 2) -> EmptyResult, // B3
+      ParseTableCells(4, 1) -> EmptyResult, // A4
+      ParseTableCells(4, 2) -> EmptyResult // B4
+    )
 
-    assert(range1 == expectedRange)
-    assert(range2 == expectedRange)
+    val mockTable = new MockTableForTests(data)
+    val rangeEvaluator = new TableRangeEvaluator(mockTable)
+
+    val defaultRangeResults = rangeEvaluator.getDefaultRangeResults
+
+    val expectedResults = Map(
+      ParseTableCells(1, 1) -> IntResult(10), // A1
+      ParseTableCells(1, 2) -> IntResult(22), // B1
+      ParseTableCells(2, 1) -> FloatResult(20.5), // A2
+      ParseTableCells(2, 2) -> FloatResult(14.5), // B2
+      ParseTableCells(3, 1) -> IntResult(30), // A3
+      ParseTableCells(3, 2) -> EmptyResult, // B3
+      //A4 B4 the row is completly empty so we strip it from the range
+    )
+
+    assert(defaultRangeResults == expectedResults)
   }
 }
-

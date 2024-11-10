@@ -1,24 +1,18 @@
 package ProcessingModules
 
+
 import ExpressionAST.EvaluationContext
-import Table.TableInterfaces._
-import Table.TableEntries.TableEntry
+import Table.DefinedTabels.BaseTable
 import Evaluation.TableEvaluator
-import Evaluation.EvaluationTypes.EvaluationResult
 
-class Evaluator(
-                 rawTable: RawTableInterface[TableEntry],
-                 evaluatedTable: EvaluatedTableInterface[EvaluationResult[_]]
-               ) {
-
+// Evaluates all cells in the provided table.
+class Evaluator(table: BaseTable) {
   def evaluateAll(): Unit = {
-    val tableEvaluator = new TableEvaluator()
-    val evaluationContext = new EvaluationContext(rawTable, tableEvaluator)
-
-    // Use TableEvaluator from the context
-    evaluationContext.getTableEvaluator.evaluateAllCellsAndStoreResults(
-      rawTable,
-      evaluatedTable
-    )
+    val context = new EvaluationContext(table.getTable)
+    val evaluator = new TableEvaluator(table, context)
+    evaluator.evaluateAllCellsAndStoreResults()
   }
 }
+
+
+ 

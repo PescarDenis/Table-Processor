@@ -1,9 +1,12 @@
 package ProcessingModules
 
 import CLIInterface.CLIConfig
-import Table.DefinedTabels.{BaseTable, TableRange}
-import Table.ParseTableCells
+import Range.TableRange
+import Table.DefinedTabels.BaseTable
+import TableParser.ParseTableCells
+
 //selects a specific range of cells from the table
+/*
 class RangeSelector(config: CLIConfig, table: BaseTable) {
   def selectRange(): BaseTable = {
     val tableRange = new TableRange(table)
@@ -30,4 +33,6 @@ class RangeSelector(config: CLIConfig, table: BaseTable) {
     }
   }
 }
+
+ */
 

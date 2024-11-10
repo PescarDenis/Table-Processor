@@ -1,4 +1,5 @@
-package Table
+package TableParser
+
 
 // Immutable data representing the location of a cell (row and column)
 case class ParseTableCells(row: Int, col: Int) {
@@ -35,7 +36,7 @@ object ParseTableCells {
     colName
   }
   
-  def getColIndex(colStr: String): Int = {
+   def getColIndex(colStr: String): Int = {
     var index = 0
     for (c <- colStr) {
       index = LETTERS.length * index + (c - 'A' + 1)
@@ -43,5 +44,5 @@ object ParseTableCells {
     index 
   }
   
-  def getRowName(row: Int): String = row.toString
+   def getRowName(row: Int): String = row.toString
 }

@@ -1,12 +1,17 @@
 package TableTest
 
-import Evaluation.EvaluationTypes.{FloatResult, IntResult, EmptyResult}
+import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
-import Table.ParseTableCells
-import Table.TableEntries.{Formula, Number, Empty}
+import Table.TableEntries.{Empty, Formula, Number}
 import ExpressionAST.EvaluationContext
+import ExpressionParser.ParserLogic.ExpressionBuilder
+import ExpressionParser.ParsingServices.DefaultExpressionParser
+import Table.DefinedTabels.MockTableForTests
+import TableParser.ParseTableCells
 
 class FormulaTest extends AnyFunSuite {
+
+  private val expressionParser = new DefaultExpressionParser(new ExpressionBuilder)
 
   test("general case scenario test") {
     val context = new EvaluationContext(Map(
@@ -17,7 +22,7 @@ class FormulaTest extends AnyFunSuite {
     context.lookup(ParseTableCells(1, 2)).set("7")  // B1 = 7
     context.lookup(ParseTableCells(1, 3)).set("10") // C1 = 10
 
-    val formulaA1 = new Formula(1, 1)  // Formula for A1 (1-based indexing)
+    val formulaA1 =  Formula(1, 1,expressionParser)  // Formula for A1 (1-based indexing)
     formulaA1.set("=B1 + C1")
 
     val resultA1 = formulaA1.evaluate(context, Set.empty) // Evaluate with an empty visited set
@@ -27,11 +32,11 @@ class FormulaTest extends AnyFunSuite {
 
   test("test scenario with referencing a formula to an empty cell") {
     val context = new EvaluationContext(Map(
-      ParseTableCells(1, 1) -> new Formula(1, 1),    // A1: Formula (1-based)
+      ParseTableCells(1, 1) -> new Formula(1, 1,expressionParser),    // A1: Formula (1-based)
       ParseTableCells(1, 2) ->  Number(1, 2),     // B1: Number (1-based)
       ParseTableCells(1, 3) ->  Number(1, 3),     // C1: Number (1-based)
       ParseTableCells(1, 4) ->  Empty(1, 4),      // D1: Empty (1-based)
-      ParseTableCells(1, 5) -> new Formula(1, 5)     // E1: Another formula (1-based)
+      ParseTableCells(1, 5) -> new Formula(1, 5,expressionParser)     // E1: Another formula (1-based)
     ))
 
     // Set values for B1 and C1
@@ -68,3 +73,4 @@ class FormulaTest extends AnyFunSuite {
     }
   }
 }
+

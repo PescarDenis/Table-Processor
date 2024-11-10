@@ -12,14 +12,14 @@ class TableEntryTest extends AnyFunSuite {
   }
 
   test("Number cell should store valid positive integers") {
-    val numberCell =  Number(1, 2)
+    val numberCell =  Number(1, 2231)
     numberCell.set("5")
     assert(!numberCell.isEmpty)
     assert(numberCell.get == "5")
   }
 
   test("Number cell should reject non-numeric input") {
-    val numberCell =  Number(1, 2)
+    val numberCell =  Number(111, 31321)
     assertThrows[IllegalArgumentException] {
       numberCell.set("abc") // Non-numeric input
     }

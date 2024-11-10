@@ -1,4 +1,4 @@
-package Evaluation.EvaluationTypes
+package Evaluation
 
 //make the trait a generic to be able to add whatever result we want, strings booleans...
 trait EvaluationResult[+T] {

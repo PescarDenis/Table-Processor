@@ -1,9 +1,10 @@
 package FilterTest
 import org.scalatest.funsuite.AnyFunSuite
 import Filters.*
-import Table.DefinedTabels._
-import Table.ParseTableCells
-import Evaluation.EvaluationTypes._
+import Table.DefinedTabels.*
+import Evaluation.EvaluationTypes.*
+import TableParser.ParseTableCells
+
 class FilterTest extends AnyFunSuite {
   val data = Map(
     ParseTableCells(1, 1) -> IntResult(10), //A1
@@ -16,24 +17,24 @@ class FilterTest extends AnyFunSuite {
     ParseTableCells(4, 2) -> EmptyResult // B4
   )
   val table= new MockTableForTests(data)
-  val evaluator = new TableFilterEvaluator(table)
+  val evaluator = new RowFilterEvaluator()
   test("Filter rows where column B <= 30") {
     val valueFilter = ValueFilter("B", "<=", 30)
-    val results = evaluator.evaluateFilter(valueFilter)
+    val results = evaluator.evaluateFilter(table,valueFilter)
     val expectedResults = List(true, true, false, false)
     assert(results == expectedResults)
   }
 
   test("Filter rows where column A == 30") {
     val valueFilter = ValueFilter("A", "!=", 30)
-    val results = evaluator.evaluateFilter(valueFilter)
+    val results = evaluator.evaluateFilter(table,valueFilter)
     val expectedResults = List(true, true, false, true)
     assert(results == expectedResults)
   }
 
   test("Filter rows where column B is empty") {
     val emptyCellFilter = EmptyCellFilter("B", isEmpty = true)
-    val results = evaluator.evaluateFilter(emptyCellFilter)
+    val results = evaluator.evaluateFilter(table,emptyCellFilter)
     val expectedResults = List(false, false, true, true)
     assert(results == expectedResults)
   }
@@ -44,10 +45,8 @@ class FilterTest extends AnyFunSuite {
 
     // Chain filters with logical AND
     val chainedFilter = ChainedFilter(List(nonEmptyFilterB, valueFilterA))
-
-    // Apply filters with evaluator
-    val evaluator = new TableFilterEvaluator(table)
-    val results = evaluator.evaluateFilter(chainedFilter)
+    
+    val results = evaluator.evaluateFilter(table,chainedFilter)
 
     // Expected output: Only rows meeting both conditions
     val expectedResults = List(false, true, false, false) // Row 2 matches both conditions
@@ -62,8 +61,7 @@ class FilterTest extends AnyFunSuite {
     val chainedFilter = ChainedFilter(List(isEmptyFilterB, valueFilterA))
 
     // Apply filters with evaluator
-    val evaluator = new TableFilterEvaluator(table)
-    val results = evaluator.evaluateFilter(chainedFilter)
+    val results = evaluator.evaluateFilter(table,chainedFilter)
 
     // Expected output: Only rows meeting both conditions
     val expectedResults = List(false, false, false, false) //none of the rows match both conditions

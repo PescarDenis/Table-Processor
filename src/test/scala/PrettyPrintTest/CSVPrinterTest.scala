@@ -2,14 +2,16 @@ package PrettyPrintTest
 
 import org.scalatest.funsuite.AnyFunSuite
 import PrettyPrint._
-import Table.ParseTableCells
 import Evaluation.EvaluationTypes._
 import Table.DefinedTabels._
 import File_Reader.CSVSeparator
 import Filters._
 import Table._
 import OutputDestination._
+import TableParser.ParseTableCells
+
 class CSVPrinterTest extends AnyFunSuite {
+
   val data = Map(
     ParseTableCells(1, 1) -> IntResult(1),
     ParseTableCells(1, 2) -> FloatResult(10.909),
@@ -37,78 +39,67 @@ class CSVPrinterTest extends AnyFunSuite {
     ParseTableCells(5, 4) -> EmptyResult,
     ParseTableCells(5, 5) -> IntResult(1)
   )
-  val table: TableInterface = new MockTableForTests(data)
-  //register PrettyPrinters in the registry before each test
-  PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
-  PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
 
-  test("Normal output after evaluation, no range,filter,only headers") {
+  val table: TableInterface = new MockTableForTests(data)
+
+  // Register PrettyPrinters in the registry
+  PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+
+  test("Normal output with no range/filter, including headers") {
     val mockOutputHandler = new MockOutputHandler()
     val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
     val tablePrinter = new TablePrinter(prettyPrinter)
 
-    // Define range and filter
-    val range: Option[(ParseTableCells, ParseTableCells)] = None
-    val filter: Option[TableFilter] = None
-    val includeHeaders : Boolean = true //tested the same for includeheaders = false and it works
+    tablePrinter.printTable(table, mockOutputHandler, None, None, includeHeaders = true)
 
-    tablePrinter.printTable(table, mockOutputHandler, range, filter, includeHeaders)
-
-    // Retrieve and print the output for verification
     val output = mockOutputHandler.getContent
-    print(output)
     val expectedOutput =
       ", A, B, C, D, E\n" +
-      "1, 1, 10.909, 100, 1000, 0\n" +
-      "2, 2, 20, 200, 2000, \n" +
-      "3, 3, 32.21, 300, 3000, 1.23\n" +
-      "4, 4, 40, 400, 4000, 0\n" +
-      "5, 5, 52.12, 500, , 1"
+        "1, 1, 10.909, 100, 1000, 0\n" +
+        "2, 2, 20, 200, 2000, \n" +
+        "3, 3, 32.21, 300, 3000, 1.23\n" +
+        "4, 4, 40, 400, 4000, 0\n" +
+        "5, 5, 52.12, 500, , 1"
 
     assert(output == expectedOutput)
   }
 
-  test("range + headers") {
+  test("Range with headers") {
     val mockOutputHandler = new MockOutputHandler()
     val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
     val tablePrinter = new TablePrinter(prettyPrinter)
-
-    // Define a range from B2 to D4 with headers included
 
     val range = Some((ParseTableCells(2, 2), ParseTableCells(4, 4)))
     tablePrinter.printTable(table, mockOutputHandler, range, None, includeHeaders = true)
 
     val output = mockOutputHandler.getContent
-    println("Range with Headers Output:\n" + output)
-
     val expectedOutput =
-        ", B, C, D\n" +
+      ", B, C, D\n" +
         "2, 20, 200, 2000\n" +
         "3, 32.21, 300, 3000\n" +
         "4, 40, 400, 4000"
 
-    assert(output == expectedOutput, "Range with headers output did not match the expected result.")
+    assert(output == expectedOutput)
   }
-  test("Range with Filter") {
+
+  test("Range with filter") {
     val mockOutputHandler = new MockOutputHandler()
     val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
     val tablePrinter = new TablePrinter(prettyPrinter)
-    // Define a range from B2 to D4 with a filter on column E to check for non-empty cells
+
     val range = Some((ParseTableCells(2, 2), ParseTableCells(4, 4)))
-    val filter = Some(EmptyCellFilter("E", isEmpty = false)) // Only include rows where column E is non-empty
+    val filter = Some(EmptyCellFilter("E", isEmpty = false)) // Include rows where column E is non-empty
     tablePrinter.printTable(table, mockOutputHandler, range, filter, includeHeaders = false)
 
     val output = mockOutputHandler.getContent
-    println("Range with Filter Output:\n" + output)
-
     val expectedOutput =
-        "32.21, 300, 3000\n" +
+      "32.21, 300, 3000\n" +
         "40, 400, 4000"
 
-    assert(output == expectedOutput, "Range with filter output did not match the expected result.")
-  }
 
+    assert(output == expectedOutput)
+  }
 }

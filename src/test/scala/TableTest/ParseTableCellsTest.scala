@@ -1,7 +1,7 @@
 package TableTest
 
+import TableParser.ParseTableCells
 import org.scalatest.funsuite.AnyFunSuite
-import Table.ParseTableCells
 
 class ParseTableCellsTest extends AnyFunSuite {
   test("test invalid inputs") {

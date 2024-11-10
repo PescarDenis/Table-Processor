@@ -5,9 +5,8 @@ import CLIInterface._
 import PrettyPrint._
 import Table.DefinedTabels.BaseTable
 import Table.TableInterfaces.{RawTableInterface, EvaluatedTableInterface}
-import Evaluation.TableEvaluator
 import scala.io.StdIn
-
+/*
 object Main {
   def printWelcomeMessage(): Unit = {
     println("Welcome to the Table Processor CLI!")
@@ -119,3 +118,4 @@ object Main {
     println("Table output completed.")
   }
 }
+ */

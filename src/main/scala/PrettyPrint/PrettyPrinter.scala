@@ -1,13 +1,12 @@
 package PrettyPrint
-import Table.TableInterfaces
-import Table.ParseTableCells
+import Table.TableInterface
 import Filters.TableFilter
-import Table.TableInterfaces.EvaluatedTableInterface
-import Evaluation.EvaluationTypes.EvaluationResult
+import TableParser.ParseTableCells
+
 ///base interface that allows the user to print the table in different formats
 trait PrettyPrinter {
   def print(
-             table: EvaluatedTableInterface[EvaluationResult[_]],
+             table: TableInterface,
              range: Option[(ParseTableCells, ParseTableCells)],
              filter: Option[TableFilter] ,
              includeHeaders: Boolean

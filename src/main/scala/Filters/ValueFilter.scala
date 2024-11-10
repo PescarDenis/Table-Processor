@@ -1,12 +1,13 @@
 package Filters
 
-import Table.ParseTableCells
-import Evaluation.EvaluationTypes.{EvaluationResult, FloatResult, IntResult}
+import Evaluation.EvaluationTypes.{FloatResult, IntResult}
+import Evaluation.EvaluationResult
+import TableParser.ParseTableCells
 
 // ValueFilter for filtering by column values with comparison operators
 case class ValueFilter(column: String, operator: String, value: Double) extends TableFilter {
 
-  override def matches(row: Map[ParseTableCells, EvaluationResult[_]]): Boolean = {
+  override def matches(row: Map[ParseTableCells, EvaluationResult[?]]): Boolean = {
     row.find { case (cell, _) => ParseTableCells.getColName(cell.col) == column } match {
       case Some((_, IntResult(cellValue))) =>
         applyOperator(cellValue.toDouble, value, operator) //convert Int to Double

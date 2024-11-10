@@ -4,9 +4,9 @@
   import File_Reader.CSVSeparator
   import PrettyPrint.{PrettyPrinterRegistry, TablePrinter}
   import Table.DefinedTabels.BaseTable
-  import Table.ParseTableCells
   import Filters._
   import OutputDestination._
+  import TableParser.ParseTableCells
 
   // Outputs the table based on various settings
   class TableOutput(config: CLIConfig, table: BaseTable) {

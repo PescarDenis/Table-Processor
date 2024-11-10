@@ -1,20 +1,27 @@
 package Table.TableEntries
 
-//knows that the table entry is a number
-case class Number(row : Int, col : Int) extends TableEntry(row , col) {
+import ExpressionAST.EvaluationContext
+import Evaluation.EvaluationTypes.*
+import Evaluation.EvaluationResult
+import TableParser.ParseTableCells
 
-  var numberValue : Option[Int] = None ///store either a float or an integer
+// Represents a table entry containing a number
+case class Number(row: Int, col: Int) extends TableEntry {
 
-  override def get: String = numberValue.map(_.toString).getOrElse("") //return value as string or empty if None
+  private var value: Option[Int] = None
 
-  override def set(value: String): Unit = {
-    //try to parse the value as an integer
-    val intValue = value.toIntOption.filter(_ >= 0)
-      .getOrElse(throw new IllegalArgumentException("Only positive integers are allowed"))
+  override def get: String = value.map(_.toString).getOrElse("")
 
-    numberValue = Some(intValue) //set the value once it's valid
+  override def set(newValue: String): Unit = {
+    val intValue = newValue.trim.toInt
+    if (intValue < 0) {
+      throw new IllegalArgumentException(s"Invalid value for Number entry at ($row, $col): $intValue (must be a positive integer)")
+    }
+    value = Some(intValue)
   }
 
-  override def isEmpty: Boolean = numberValue.isEmpty //we have a number so it is not empty
+  override def isEmpty: Boolean = value.isEmpty
 
+  override def evaluate(context: EvaluationContext, visited: Set[ParseTableCells]): EvaluationResult[Int] =
+    IntResult(value.getOrElse(throw new IllegalStateException(s"No value set for Number at ($row, $col)")))
 }
