@@ -13,6 +13,8 @@ class BaseTable(parser: FileParser) extends TableInterface {
   private var evaluatedResults: Map[ParseTableCells, EvaluationResult[?]] = Map()
 
   def getTable: Map[ParseTableCells, TableEntry] = rows //getter for the internal row map
+
+  def getParser: FileParser = parser
   override def initializeRows(parsedRows: Map[ParseTableCells, TableEntry]): Unit = 
     rows = parsedRows //used after we get the parsed table
   
