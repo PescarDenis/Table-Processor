@@ -1,38 +1,29 @@
 package ProcessingModules
 
 import CLIInterface.CLIConfig
-import Range.TableRange
 import Table.DefinedTabels.BaseTable
+import Range.TableRangeEvaluator
 import TableParser.ParseTableCells
 
-//selects a specific range of cells from the table
-/*
-class RangeSelector(config: CLIConfig, table: BaseTable) {
-  def selectRange(): BaseTable = {
-    val tableRange = new TableRange(table)
-    config.range match {
-      case Some((start, end)) =>
-        val fromCell = ParseTableCells.parse(start).getOrElse(
-          throw new IllegalArgumentException(s"Invalid start cell reference: $start")
-        )
-        val toCell = ParseTableCells.parse(end).getOrElse(
-          throw new IllegalArgumentException(s"Invalid end cell reference: $end")
-        )
-        val rangeMap = tableRange.getRange(fromCell, toCell)
-        rangeMap.foreach { case (cellPos, result) =>
-          table.storeEvaluatedResult(cellPos, result)
-        }
-        table
 
+// Selects a specific range of cells from the table.
+class RangeSelector(config: CLIConfig, table: BaseTable) {
+
+  def selectRange(): BaseTable = {
+    val rangeEvaluator = new TableRangeEvaluator(table)
+    val range = config.range match {
+      case Some((fromCell, toCell)) =>
+        rangeEvaluator.getResultsInRange(fromCell, toCell)
       case None =>
-        val defaultRangeMap = tableRange.getDefaultRange
-        defaultRangeMap.foreach { case (cellPos, result) =>
-          table.storeEvaluatedResult(cellPos, result)
-        }
-        table
+        rangeEvaluator.getDefaultRangeResults
     }
+
+    // Using `.view.mapValues(f).toMap` to avoid the deprecated symbol
+    val evaluatedRows = range.view.mapValues(_.toEntry).toMap
+
+    val newTable = new BaseTable(table.parser)
+    newTable.initializeRows(evaluatedRows)
+    newTable
   }
 }
-
- */
 
