@@ -19,7 +19,7 @@ trait TableInterface {
   def nonEmptyPositions: Iterable[ParseTableCells]
 
   def getRawEntires: Iterable[ParseTableCells]
-  
+
   def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[?]): Unit
 
   def getEvaluatedResult(pos: ParseTableCells): Option[EvaluationResult[?]]
@@ -30,5 +30,5 @@ trait TableInterface {
 
   def parse(csvReader: CSVReader): Unit
 
-  def initializeRows(parsedRows: Map[ParseTableCells, TableEntry]): Unit
+  def initializeRows(parsedRows: TableModel[TableEntry]): Unit
 }

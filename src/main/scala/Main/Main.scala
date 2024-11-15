@@ -5,6 +5,7 @@ import CLIInterface.*
 import TableParser.FileParser
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 import ExpressionParser.ParserLogic.ExpressionBuilder
+import PrettyPrint.{CSVPrettyPrinter, MarkdownPrettyPrinter, PrettyPrinterRegistry}
 object Main {
 
   def printWelcomeMessage(): Unit = {
@@ -20,7 +21,8 @@ object Main {
       printWelcomeMessage()
       return
     }
-
+    PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+    PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
     cli.parse(args.toList) match {
       case Some(config) =>
         try {
@@ -46,7 +48,7 @@ object Main {
         }
 
       case None =>
-        println("Invalid configuration. Use --help for guidance.")
+        println("Invalid configuration. Use --help or -h for guidance.")
     }
   }
 }

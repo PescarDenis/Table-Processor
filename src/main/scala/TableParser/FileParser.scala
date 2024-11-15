@@ -3,20 +3,22 @@ package TableParser
 import ExpressionParser.ParsingServices.ExpressionParser
 import File_Reader.CSVReader
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
+import Table.TableModel
 
 class FileParser(parser: ExpressionParser) extends TableParser {
 
-  override def parse(data: CSVReader): Map[ParseTableCells, TableEntry] = {
-    data.zipWithIndex.flatMap { case (row, rowIndex) =>
+  override def parse(data: CSVReader): TableModel[TableEntry] = {
+    val entries = data.zipWithIndex.flatMap { case (row, rowIndex) =>
       row.zipWithIndex.map { case (cellValue, colIndex) =>
         val cellPos = ParseTableCells(rowIndex + 1, colIndex + 1)
-        val entry = parseCell(cellValue, rowIndex + 1, colIndex + 1)
-        cellPos -> entry
+        cellPos -> parseCell(cellValue.trim, rowIndex + 1, colIndex + 1)
       }
     }.toMap
+
+    new TableModel(entries)
   }
 
-  private def parseCell(cellValue: String, rowIndex: Int, colIndex: Int): TableEntry = {
+    private def parseCell(cellValue: String, rowIndex: Int, colIndex: Int): TableEntry = {
     if (cellValue.trim.isEmpty) {
       Empty(rowIndex, colIndex)
     } else if (cellValue.startsWith("=") || cellValue.matches(".*[+\\-*/].*")) {

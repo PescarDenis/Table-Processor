@@ -1,6 +1,6 @@
 package ExpressionAST
 
-import Evaluation.EvaluationTypes.{EvaluationError, FloatResult, IntResult}
+import Evaluation.EvaluationTypes.{EmptyResult, EvaluationError, FloatResult, IntResult}
 import Evaluation.EvaluationResult
 
 //a case class that performs the subtraction of two expressions
@@ -8,16 +8,23 @@ case class SubtractExpression[T](left: Expression[T], right: Expression[T]) exte
 
   override def operator(leftValue: EvaluationResult[T], rightValue: EvaluationResult[T]): EvaluationResult[T] = {
     (leftValue, rightValue) match {
+      case (EmptyResult, _) | (_, EmptyResult) =>
+        EvaluationError("Empty cell in arithmetic operation") // Error for empty cells
+      case (EvaluationError(msg), _) =>
+        EvaluationError(msg)
+      case (_, EvaluationError(msg)) =>
+        EvaluationError(msg)
+
       case (IntResult(l), IntResult(r)) =>
-        IntResult(l - r).asInstanceOf[EvaluationResult[T]] // Subtract two integers
+        IntResult(l - r) // Subtract two integers
       case (FloatResult(l), FloatResult(r)) =>
-        FloatResult(l - r).asInstanceOf[EvaluationResult[T]] // Subtract two floats
+        FloatResult(l - r)// Subtract two floats
       case (IntResult(l), FloatResult(r)) =>
-        FloatResult(l - r).asInstanceOf[EvaluationResult[T]] // Promote Int to Float and subtract
+        FloatResult(l - r) // Promote Int to Float and subtract
       case (FloatResult(l), IntResult(r)) =>
-        FloatResult(l - r).asInstanceOf[EvaluationResult[T]] // Promote Int to Float and subtract
+        FloatResult(l - r) // Promote Int to Float and subtract
       case _ =>
-        EvaluationError("Operation not supported for these types").asInstanceOf[EvaluationResult[T]]
+        EvaluationError("Unsupported operation between these types")
     }
   }
 }

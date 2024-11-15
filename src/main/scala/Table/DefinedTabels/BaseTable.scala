@@ -3,58 +3,63 @@ package Table.DefinedTabels
 import Evaluation.EvaluationResult
 import Evaluation.EvaluationTypes._
 import File_Reader.CSVReader
-import Table.TableInterface
+import Table.{TableInterface, TableModel}
 import TableParser.{FileParser, ParseTableCells}
 import Table.TableEntries.{Empty, TableEntry}
 import ExpressionAST.EvaluationContext
 import Evaluation.TableEvaluator
+
 class BaseTable(parser: FileParser) extends TableInterface {
-  private var rows: Map[ParseTableCells, TableEntry] = Map()
-  private var evaluatedResults: Map[ParseTableCells, EvaluationResult[?]] = Map()
 
-  def getTable: Map[ParseTableCells, TableEntry] = rows //getter for the internal row map
+  private var rawModel: TableModel[TableEntry] = new TableModel(Map())
+  private var evaluatedModel: TableModel[EvaluationResult[?]] = new TableModel(Map())
 
-  def getParser: FileParser = parser
-  override def initializeRows(parsedRows: Map[ParseTableCells, TableEntry]): Unit = 
-    rows = parsedRows //used after we get the parsed table
-  
-  override def getCell(pos: ParseTableCells): TableEntry =
-    rows.getOrElse(pos, Empty(pos.row, pos.col))
-  
+  override def initializeRows(parsedRows: TableModel[TableEntry]): Unit = {
+    rawModel = parsedRows
+  }
 
-  override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[?]] =
-    evaluatedResults.filter { case (cell, _) => cell.row == rowIndex }
+  override def getCell(pos: ParseTableCells): TableEntry = {
+    rawModel.getCell(pos).getOrElse(Empty(pos.row, pos.col))
+  }
 
-  override def lastRow: Option[Int] =
-    rows.keys.map(_.row).maxOption
+  override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[?]]= {
+    evaluatedModel.toMap.view.filterKeys(_.row == rowIndex).toMap
+  }
 
-  override def lastColumn: Option[Int] =
-    rows.keys.map(_.col).maxOption
+  override def lastRow: Option[Int] = {
+    rawModel.nonEmptyPositions.map(_.row).maxOption
+  }
+
+  override def lastColumn: Option[Int] = {
+    rawModel.nonEmptyPositions.map(_.col).maxOption
+  }
 
   override def nonEmptyPositions: Iterable[ParseTableCells] = {
-    evaluatedResults.collect {
-      case (pos, result) if !result.isInstanceOf[EmptyResult.type] => pos
-    }.toList
+    evaluatedModel.nonEmptyPositions
   }
-  override def getRawEntires: Iterable[ParseTableCells] = rows.keys //get all the raw entries
-  
-  override def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[?]): Unit =
-    evaluatedResults += (pos -> result)
 
-  override def getEvaluatedResult(pos: ParseTableCells): Option[EvaluationResult[?]] =
-    evaluatedResults.get(pos)
+  override def getRawEntires: Iterable[ParseTableCells] = rawModel.nonEmptyPositions
+
+  override def storeEvaluatedResult(pos: ParseTableCells, result: EvaluationResult[?]): Unit = {
+    evaluatedModel = evaluatedModel.updateCell(pos, result)
+  }
+
+  override def getEvaluatedResult(pos: ParseTableCells): Option[EvaluationResult[?]] = {
+    evaluatedModel.getCell(pos)
+  }
 
   override def getEvaluatedResultAsString(pos: ParseTableCells): String = {
-    evaluatedResults.get(pos).map {
+    evaluatedModel.getCell(pos).map {
       case IntResult(value) => value.toString
       case FloatResult(value) => value.toString
-      case EmptyResult => ""
-      case _ => "ERROR"
-    }.getOrElse(" ") //convert each result to its string implementation
+      case EmptyResult       => ""
+      case _                 => "ERROR" //it will never reach this case, because we exit when the evaluation fails
+    }.getOrElse(" ")
   }
 
-  override def parse(csvReader: CSVReader): Unit =
-    initializeRows(parser.parse(csvReader)) // Decoupled parsing and initialization
+  override def parse(csvReader: CSVReader): Unit = {
+    initializeRows(parser.parse(csvReader))
+  }
 
   override def evaluateAllCells(context: EvaluationContext): Unit = {
     val evaluator = new TableEvaluator(this, context)

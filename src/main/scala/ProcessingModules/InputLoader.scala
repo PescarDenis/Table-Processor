@@ -8,8 +8,6 @@ import TableParser.{FileParser, TableParser}
 import scala.io.Source
 //responsible for loading the table from a specific file, with different separators
 
-// Responsible for loading the input file and delegating parsing
-
 class InputLoader(config: CLIConfig, parser: FileParser) {
 
   def loadTable(): BaseTable = {

@@ -1,6 +1,6 @@
 package PrettyPrint
 
-import Table.TableInterface
+import Table.{TableInterface, TableModel}
 import Filters.TableFilter
 import File_Reader.CSVSeparator
 import TableParser.ParseTableCells
@@ -13,18 +13,17 @@ class CSVPrettyPrinter(separator: CSVSeparator) extends BaseTablePrettyPrinter {
                                      ): Option[String] = {
     if (!includeHeaders) None
     else {
-      // Ensure all columns are printed, even when they contain empty values
       val colHeaders = cols.map(ParseTableCells.getColName)
       Some((Seq("") ++ colHeaders).mkString(separator.CellSeparator + " "))
     }
   }
 
   override protected def buildRows(
-                                    rows: Map[Int, Map[ParseTableCells, String]],
+                                    rows: TableModel[String],
                                     includeRowNumbers: Boolean
                                   ): Seq[String] = {
-    rows.toSeq.sortBy(_._1).map { case (rowIdx, rowCells) =>
-      val rowData = rowCells.toSeq.sortBy(_._1.col).map(_._2)
+    rows.iterator.toSeq.groupBy{case (pos, _) => pos.row }.toSeq.sortBy(_._1).map { case (rowIdx, rowCells) =>
+      val rowData = rowCells.sortBy(_._1.col).map(_._2)
       if (includeRowNumbers) {
         (Seq(rowIdx.toString) ++ rowData).mkString(separator.CellSeparator + " ")
       } else {
@@ -45,8 +44,6 @@ class CSVPrettyPrinter(separator: CSVSeparator) extends BaseTablePrettyPrinter {
     val headers = buildHeaders(effectiveRange._1.col to effectiveRange._2.col, includeHeaders)
     val dataRows = buildRows(rows, includeRowNumbers = includeHeaders)
 
-    // Combine headers and rows
     (headers.toSeq ++ dataRows).mkString("\n")
   }
-  
 }

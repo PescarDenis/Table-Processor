@@ -2,7 +2,7 @@ package PrettyPrint
 
 import File_Reader.CSVSeparator
 
-//Registry object to manage PrettyPrinter instances for different formats
+//Registry class to manage PrettyPrinter instances for different formats
 object PrettyPrinterRegistry {
   //a map that associates format strings (e.g., "csv", "md") with functions that create PrettyPrinters.
   private var printers: Map[String, CSVSeparator => PrettyPrinter] = Map()

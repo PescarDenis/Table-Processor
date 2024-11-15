@@ -1,6 +1,6 @@
 package PrettyPrint
 
-import Table.TableInterface
+import Table.{TableInterface, TableModel}
 import Filters.TableFilter
 import TableParser.ParseTableCells
 
@@ -24,10 +24,10 @@ class MarkdownPrettyPrinter extends BaseTablePrettyPrinter {
   }
 
   override protected def buildRows(
-                                    rows: Map[Int, Map[ParseTableCells, String]],
+                                    rows: TableModel[String],
                                     includeRowNumbers: Boolean
                                   ): Seq[String] = {
-    rows.toSeq.sortBy(_._1).map { case (rowIdx, rowCells) =>
+    rows.iterator.toSeq.groupBy{case (pos, _) => pos.row }.toSeq.sortBy(_._1).map { case (rowIdx, rowCells) =>
       val rowData = rowCells.toSeq.sortBy(_._1.col).map(_._2)
       if (includeRowNumbers) {
         (Seq(rowIdx.toString) ++ rowData).mkString("| ", " | ", " |")

@@ -1,12 +1,12 @@
 package PrettyPrint
 
 import Evaluation.EvaluationResult
-import Table.TableInterface
+import Table.{TableInterface, TableModel}
 import Filters.{RowFilterEvaluator, TableFilter}
 import Range.TableRangeEvaluator
 import TableParser.ParseTableCells
 import File_Reader.CSVSeparator
-import Filters.RowFilterEvaluator
+
 abstract class BaseTablePrettyPrinter extends PrettyPrinter {
 
   // Determine the effective range for the table
@@ -21,38 +21,43 @@ abstract class BaseTablePrettyPrinter extends PrettyPrinter {
     }
   }
 
-  // Fetch and filter rows as strings
+  // Fetch and filter rows as strings using TableModel
   protected def getFilteredRows(
                                  table: TableInterface,
                                  range: (ParseTableCells, ParseTableCells),
                                  filter: Option[TableFilter]
-                               ): Map[Int, Map[ParseTableCells, String]] = {
-    val tableRange = new TableRangeEvaluator(table)
+                               ): TableModel[String] = {
+    val tableRangeEvaluator = new TableRangeEvaluator(table)
     val tableFilterEvaluator = new RowFilterEvaluator
-    val rangeResults = tableRange.getResultsInRange(range._1, range._2)
 
+    val rangeModel = tableRangeEvaluator.getResultsInRange(range._1, range._2)
     val filteredRows = filter match {
       case Some(f) =>
-        val filterResults = tableFilterEvaluator.evaluateFilter(table,f)
+        val filterResults = tableFilterEvaluator.evaluateFilter(table, f)
         val matchingRowIndices = filterResults.zipWithIndex.collect {
           case (true, idx) => idx + 1
         }.toSet
-        rangeResults.groupBy(_._1.row).filter { case (rowIndex, _) => matchingRowIndices.contains(rowIndex) }
-      case None => rangeResults.groupBy(_._1.row)
+
+        rangeModel.toMap.view.filterKeys(pos => matchingRowIndices.contains(pos.row)).toMap
+      case None => rangeModel.toMap
     }
 
-    filteredRows.map { case (rowIdx, cells) =>
-      rowIdx -> cells.toMap.map { case (cell, _) => cell -> table.getEvaluatedResultAsString(cell) }
+    // Convert results to strings and construct a new TableModel
+    val stringifiedResults = filteredRows.map {
+      case (pos, _) => pos -> table.getEvaluatedResultAsString(pos)
     }
+
+    new TableModel(stringifiedResults)
   }
 
+  // Abstract methods to be implemented by subclasses
   protected def buildHeaders(
                               cols: Seq[Int],
                               includeHeaders: Boolean
                             ): Option[String]
 
   protected def buildRows(
-                           rows: Map[Int, Map[ParseTableCells, String]],
+                           rows: TableModel[String],
                            includeRowNumbers: Boolean
                          ): Seq[String]
 }

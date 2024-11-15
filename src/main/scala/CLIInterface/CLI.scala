@@ -16,6 +16,11 @@ class CLI {
   )
 
   def parse(args: List[String]): Option[CLIConfig] = {
+    if (args.contains("--help") || args.contains("-h")) {
+      printHelp() // Help function
+      return None
+    }
+
     var config = CLIConfig()
     var remainingArgs = args
 
@@ -37,9 +42,15 @@ class CLI {
         return None
       }
     }
-    Some(config)
+    //Check for the required input file parameter
+    if (config.inputFile.isEmpty) {
+      println("Error: --input-file is required.")
+      printHelp()
+      None
+    } else {
+      Some(config)
+    }
   }
-
   def printHelp(): Unit = {
     val visitor = new HelpVisitor()
     handlers.foreach(_.accept(visitor))

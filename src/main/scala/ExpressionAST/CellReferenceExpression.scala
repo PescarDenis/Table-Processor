@@ -1,6 +1,6 @@
 package ExpressionAST
 
-import Evaluation.EvaluationTypes.{EmptyResult, IntResult}
+import Evaluation.EvaluationTypes.{EmptyResult, EvaluationError, IntResult}
 import Evaluation.EvaluationResult
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
 import TableParser.ParseTableCells
@@ -10,11 +10,11 @@ case class CellReferenceExpression[T](cell: ParseTableCells) extends Expression[
 
   override def evaluate(context: EvaluationContext, visited: Set[ParseTableCells]): EvaluationResult[T] = {
     if (visited.contains(cell)) {
-      throw new IllegalArgumentException(s"Circular dependency detected at cell: $cell")
+      EvaluationError(s"Circular dependency detected at cell: $cell").asInstanceOf[EvaluationResult[T]]
+    } else {
+      val entry: TableEntry = context.lookup(cell)
+      entry.evaluate(context, visited + cell).asInstanceOf[EvaluationResult[T]]
     }
-
-    val entry: TableEntry = context.lookup(cell)
-    entry.evaluate(context, visited + cell).asInstanceOf[EvaluationResult[T]]
   }
 }
 
