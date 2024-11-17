@@ -2,7 +2,7 @@ package CLIInterface.Handlers
 
 import CLIInterface.CLIConfig
 
-class RangeHandler extends BaseParameterHandler[(String, String)]("--range", "Prints only the specified rectangle of the table.") {
+class RangeHandler extends BaseParameterHandler[(String, String)]("--range", "Prints only the specified rectangle of the table.(optional,default is the whole table)") {
   override def handle(args: List[String], config: CLIConfig): (CLIConfig, List[String]) = {
     args match {
       case "--range" :: from :: to :: tail =>

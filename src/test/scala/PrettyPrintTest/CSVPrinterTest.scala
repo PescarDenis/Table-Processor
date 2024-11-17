@@ -1,13 +1,14 @@
 package PrettyPrintTest
 
 import org.scalatest.funsuite.AnyFunSuite
-import PrettyPrint._
-import Evaluation.EvaluationTypes._
-import Table.DefinedTabels._
+import PrettyPrint.*
+import Evaluation.EvaluationTypes.*
+import Table.DefinedTabels.*
 import File_Reader.CSVSeparator
-import Filters._
-import Table._
-import OutputDestination._
+import Filters.*
+import Table.*
+import OutputDestination.*
+import Range.TableRangeEvaluator
 import TableParser.ParseTableCells
 
 class CSVPrinterTest extends AnyFunSuite {
@@ -40,6 +41,13 @@ class CSVPrinterTest extends AnyFunSuite {
     ParseTableCells(5, 5) -> IntResult(1)
   )
 
+  def convertToStringModel(table: TableInterface): TableModel[String] = {
+    val stringifiedResults = table.nonEmptyPositions.map { pos =>
+      pos -> table.getEvaluatedResultAsString(pos)
+    }.toMap
+    new TableModel(stringifiedResults)
+  }
+
   val table: TableInterface = new MockTableForTests(data)
 
   // Register PrettyPrinters in the registry
@@ -50,8 +58,9 @@ class CSVPrinterTest extends AnyFunSuite {
     val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
     val tablePrinter = new TablePrinter(prettyPrinter)
+    val stringifiedModel = convertToStringModel(table) // Convert table to TableModel[String]
 
-    tablePrinter.printTable(table, mockOutputHandler, None, None, includeHeaders = true)
+    tablePrinter.printTable(stringifiedModel, mockOutputHandler, includeHeaders = true)
 
     val output = mockOutputHandler.getContent
     val expectedOutput =
@@ -69,10 +78,15 @@ class CSVPrinterTest extends AnyFunSuite {
     val mockOutputHandler = new MockOutputHandler()
     val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
-    val tablePrinter = new TablePrinter(prettyPrinter)
+    val rangeEvaluator = new TableRangeEvaluator(new TableModel(data))
+    val rangedModel = rangeEvaluator.getResultsInRange(ParseTableCells(2, 2), ParseTableCells(4, 4))
 
-    val range = Some((ParseTableCells(2, 2), ParseTableCells(4, 4)))
-    tablePrinter.printTable(table, mockOutputHandler, range, None, includeHeaders = true)
+    val stringifiedModel = new TableModel(rangedModel.iterator.map {
+      case (pos, result) => pos -> table.getEvaluatedResultAsString(pos)
+    }.toMap)
+
+    val tablePrinter = new TablePrinter(prettyPrinter)
+    tablePrinter.printTable(stringifiedModel, mockOutputHandler, includeHeaders = true)
 
     val output = mockOutputHandler.getContent
     val expectedOutput =
@@ -84,21 +98,31 @@ class CSVPrinterTest extends AnyFunSuite {
     assert(output == expectedOutput)
   }
 
-  test("Range with filter") {
+  test("Filter and range selection") {
     val mockOutputHandler = new MockOutputHandler()
     val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
 
-    val tablePrinter = new TablePrinter(prettyPrinter)
+    val filter = EmptyCellFilter("E", isEmpty = false)
+    val evaluator = new Filters.TableFilterEvaluator(table)
+    val filteredRows = evaluator.evaluateFilter(filter).zipWithIndex.collect {
+      case (true, idx) => idx + 1
+    }.toSet
 
-    val range = Some((ParseTableCells(2, 2), ParseTableCells(4, 4)))
-    val filter = Some(EmptyCellFilter("E", isEmpty = false)) // Include rows where column E is non-empty
-    tablePrinter.printTable(table, mockOutputHandler, range, filter, includeHeaders = false)
+    val filteredData = data.filter { case (cell, _) => filteredRows.contains(cell.row) }
+    val rangeEvaluator = new TableRangeEvaluator(new TableModel(filteredData))
+    val rangedModel = rangeEvaluator.getResultsInRange(ParseTableCells(2, 2), ParseTableCells(4, 4))
+
+    val stringifiedModel = new TableModel(rangedModel.iterator.map {
+      case (pos, result) => pos -> table.getEvaluatedResultAsString(pos)
+    }.toMap)
+
+    val tablePrinter = new TablePrinter(prettyPrinter)
+    tablePrinter.printTable(stringifiedModel, mockOutputHandler, includeHeaders = false)
 
     val output = mockOutputHandler.getContent
     val expectedOutput =
       "32.21, 300, 3000\n" +
         "40, 400, 4000"
-
 
     assert(output == expectedOutput)
   }

@@ -5,12 +5,13 @@ import ExpressionAST.EvaluationContext
 import File_Reader.CSVReader
 import Table.TableEntries.*
 import TableParser.ParseTableCells
+import Filters.Row
 // Generic interface for a table
 trait TableInterface {
 
   def getCell(pos: ParseTableCells): TableEntry
 
-  def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[?]]
+  def getRow(rowIndex: Int): Row
 
   def lastRow: Option[Int]
 

@@ -10,7 +10,7 @@ case class CellReferenceExpression[T](cell: ParseTableCells) extends Expression[
 
   override def evaluate(context: EvaluationContext, visited: Set[ParseTableCells]): EvaluationResult[T] = {
     if (visited.contains(cell)) {
-      EvaluationError(s"Circular dependency detected at cell: $cell").asInstanceOf[EvaluationResult[T]]
+      EvaluationError(s"Circular dependency detected at cell: $cell")
     } else {
       val entry: TableEntry = context.lookup(cell)
       entry.evaluate(context, visited + cell).asInstanceOf[EvaluationResult[T]]

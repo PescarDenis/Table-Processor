@@ -5,7 +5,8 @@ import Filters.{ChainedFilter, EmptyCellFilter, TableFilter, ValueFilter}
 
 class FiltersHandler extends BaseParameterHandler[List[TableFilter]](
   "--filter",
-  "Specifies filters to apply to the table. Options: --filter [COLUMN] [OPERATOR] [VALUE], --filter-is-empty [COLUMN], --filter-is-not-empty [COLUMN]."
+  "Specifies filters to apply to the table. Options: --filter [COLUMN] [OPERATOR] [VALUE], --filter-is-empty [COLUMN], --filter-is-not-empty [COLUMN]. The filters can be chained together by " +
+    "applying multiple filters at once.(optional, the filters can be repeated)"
 ) {
 
   override def handle(args: List[String], config: CLIConfig): (CLIConfig, List[String]) = {

@@ -23,8 +23,8 @@ class RangeTest extends AnyFunSuite {
   )
 
   // Mock table implementation
-  val mockTable = new MockTableForTests(data)
-  val rangeEvaluator = new TableRangeEvaluator(mockTable)
+  val tableModel = new TableModel(data)
+  val rangeEvaluator = new TableRangeEvaluator(tableModel)
 
   test("Range selection from A1 to B3") {
     val expectedRange = Map(
@@ -91,8 +91,9 @@ class RangeTest extends AnyFunSuite {
       ParseTableCells(4, 2) -> EmptyResult // B4
     )
 
-    val mockTable = new MockTableForTests(data)
-    val rangeEvaluator = new TableRangeEvaluator(mockTable)
+    val tableModel = new TableModel(data)
+
+    val rangeEvaluator = new TableRangeEvaluator(tableModel)
 
     val defaultRangeResults = rangeEvaluator.getDefaultRangeResults
 

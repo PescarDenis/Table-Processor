@@ -11,6 +11,7 @@ object Main {
   def printWelcomeMessage(): Unit = {
     println("Welcome to the Table Processor CLI!")
     println("Run the program with the desired file and parameters.")
+    println("""Please enter everything after sbt in double quotes. When using the ; separator, enter it as \";\".""")
     println("For help, use: sbt run --help or -h.")
   }
 
@@ -35,13 +36,13 @@ object Main {
           evaluator.evaluateAll()
 
           // Step 3: Apply filters to the table
-          new Filtering(config, table).applyFilters()
+          val filteredModel = new Filtering(config, table).applyFilters()
 
           // Step 4: Select the specified range of cells
-          val selectedTable = new RangeSelector(config, table).selectRange()
+          val rangedModel = new RangeSelector(config, filteredModel).selectRange()
 
           // Step 5: Output the table in the specified format
-          new TableOutput(config, selectedTable).output()
+          new TableOutput(config, rangedModel).output()
         } catch {
           case ex: Exception =>
             println(s"An error occurred: ${ex.getMessage}")

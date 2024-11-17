@@ -8,6 +8,7 @@ import TableParser.{FileParser, ParseTableCells}
 import Table.TableEntries.{Empty, TableEntry}
 import ExpressionAST.EvaluationContext
 import Evaluation.TableEvaluator
+import Filters.Row
 
 class BaseTable(parser: FileParser) extends TableInterface {
 
@@ -22,8 +23,8 @@ class BaseTable(parser: FileParser) extends TableInterface {
     rawModel.getCell(pos).getOrElse(Empty(pos.row, pos.col))
   }
 
-  override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[?]]= {
-    evaluatedModel.toMap.view.filterKeys(_.row == rowIndex).toMap
+  override def getRow(rowIndex: Int): Row = {
+    new Row(rowIndex, evaluatedModel)
   }
 
   override def lastRow: Option[Int] = {

@@ -4,11 +4,9 @@ import CLIInterface.CLIConfig
 import File_Reader.CSVSeparator
 import PrettyPrint.{PrettyPrinterRegistry, TablePrinter}
 import OutputDestination.{FileOutputHandler, StdoutOutputHandler}
-import Table.DefinedTabels.BaseTable
-import TableParser.ParseTableCells
-import Filters.{ChainedFilter, TableFilter}
+import Table.TableModel
 
-class TableOutput(config: CLIConfig, table: BaseTable) {
+class TableOutput(config: CLIConfig, rangedModel: TableModel[String]) {
 
   def output(): Unit = {
     val separator = CSVSeparator(config.outputSeparator)
@@ -22,17 +20,9 @@ class TableOutput(config: CLIConfig, table: BaseTable) {
         return
     }
 
-    val range = config.range.flatMap { case (start, end) =>
-      for {
-        fromCell <- ParseTableCells.parse(start)
-        toCell <- ParseTableCells.parse(end)
-      } yield (fromCell, toCell)
-    }
-
-    val filter: Option[TableFilter] =
-      if (config.filters.nonEmpty) Some(ChainedFilter(config.filters)) else None
-
     val tablePrinter = new TablePrinter(prettyPrinter)
-    tablePrinter.printTable(table, outputHandler, range, filter, config.headers)
+    tablePrinter.printTable(rangedModel, outputHandler, config.headers)
   }
 }
+
+

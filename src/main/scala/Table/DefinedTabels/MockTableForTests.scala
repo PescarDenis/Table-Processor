@@ -5,42 +5,43 @@ import Evaluation.EvaluationResult
 import TableParser.{FileParser, ParseTableCells}
 import ExpressionParser.ParserLogic.*
 import ExpressionParser.ParsingServices.DefaultExpressionParser
+import Table.TableModel
+import Filters.Row
 
 class MockTableForTests(
                          initialData: Map[ParseTableCells, EvaluationResult[?]]
                        ) extends BaseTable(new FileParser(new DefaultExpressionParser(new ExpressionBuilder))) {
 
-
-  protected var evaluatedResults: Map[ParseTableCells, EvaluationResult[?]] = initialData
+  // Use TableModel to encapsulate evaluated results
+  protected var evaluatedResults: TableModel[EvaluationResult[?]] = new TableModel(initialData)
 
   override def getEvaluatedResult(cell: ParseTableCells): Option[EvaluationResult[?]] = {
-    evaluatedResults.get(cell)
+    evaluatedResults.getCell(cell)
   }
 
   override def lastRow: Option[Int] = {
-    if (evaluatedResults.isEmpty) None else evaluatedResults.keys.map(_.row).maxOption
+    evaluatedResults.nonEmptyPositions.map(_.row).maxOption
   }
 
   override def lastColumn: Option[Int] = {
-    if (evaluatedResults.isEmpty) None else evaluatedResults.keys.map(_.col).maxOption
+    evaluatedResults.nonEmptyPositions.map(_.col).maxOption
   }
 
-  override def getRow(rowIndex: Int): Map[ParseTableCells, EvaluationResult[?]] = {
-    evaluatedResults.filter { case (cell, _) => cell.row == rowIndex }
+  // Implement getRow to return a Row object
+  override def getRow(rowIndex: Int): Row = {
+    new Row(rowIndex, evaluatedResults)
   }
 
   override def nonEmptyPositions: Iterable[ParseTableCells] = {
-    evaluatedResults.collect {
-      case (pos, result) if !result.isInstanceOf[EmptyResult.type] => pos
-    }.toList
+    evaluatedResults.nonEmptyPositions
   }
 
   override def getEvaluatedResultAsString(pos: ParseTableCells): String = {
-    evaluatedResults.get(pos).map {
-      case IntResult(value) => value.toString
+    evaluatedResults.getCell(pos).map {
+      case IntResult(value)  => value.toString
       case FloatResult(value) => value.toString
-      case EmptyResult => ""
-      case _ => "Error"
+      case EmptyResult        => ""
+      case _                 => "Error"
     }.getOrElse("   ")
   }
 }

@@ -1,14 +1,17 @@
 package ProcessingModules
 
 import CLIInterface.CLIConfig
-import Table.DefinedTabels.BaseTable
+import Evaluation.EvaluationResult
+import Evaluation.EvaluationTypes._
 import Range.TableRangeEvaluator
+import Table.TableModel
 import TableParser.ParseTableCells
+import Table.DefinedTabels.BaseTable
 
-class RangeSelector(config: CLIConfig, table: BaseTable) {
+class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResult[_]]) {
 
-  def selectRange(): BaseTable = {
-    val tableRangeEvaluator = new TableRangeEvaluator(table)
+  def selectRange(): TableModel[String] = {
+    val tableRangeEvaluator = new TableRangeEvaluator(filteredModel)
 
     val rangeResults = config.range match {
       case Some((start, end)) =>
@@ -24,11 +27,21 @@ class RangeSelector(config: CLIConfig, table: BaseTable) {
         tableRangeEvaluator.getDefaultRangeResults
     }
 
-    // Use iterator to process the TableModel entries
-    rangeResults.iterator.foreach { case (cellPos, evalResult) =>
-      table.storeEvaluatedResult(cellPos, evalResult)
-    }
+    // Convert EvaluationResult[_] to String
+    val stringifiedResults = rangeResults.iterator.map {
+      case (pos, result) => pos -> convertToString(result)
+    }.toMap
 
-    table // Return the modified table
+    new TableModel(stringifiedResults)
+  }
+
+  private def convertToString(result: EvaluationResult[_]): String = {
+    result match {
+      case IntResult(value)  => value.toString
+      case FloatResult(value) => value.toString
+      case EmptyResult        => ""
+      case _                 => "ERROR" // This should never happen with valid evaluations
+    }
   }
 }
+
