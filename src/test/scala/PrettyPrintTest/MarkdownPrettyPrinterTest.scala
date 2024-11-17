@@ -13,7 +13,7 @@ import Range.TableRangeEvaluator
 
 class MarkdownPrettyPrinterTest extends AnyFunSuite {
 
-  val data = Map(
+  val data: Map[ParseTableCells, IntResult] = Map(
     ParseTableCells(1, 1) -> IntResult(10),
     ParseTableCells(1, 2) -> IntResult(33),
     ParseTableCells(1, 3) -> IntResult(1),

@@ -1,5 +1,6 @@
 package PrettyPrintTest
 
+import Evaluation.EvaluationResult
 import org.scalatest.funsuite.AnyFunSuite
 import PrettyPrint.*
 import Evaluation.EvaluationTypes.*
@@ -13,7 +14,7 @@ import TableParser.ParseTableCells
 
 class CSVPrinterTest extends AnyFunSuite {
 
-  val data = Map(
+  val data: Map[ParseTableCells, EvaluationResult[?]] = Map(
     ParseTableCells(1, 1) -> IntResult(1),
     ParseTableCells(1, 2) -> FloatResult(10.909),
     ParseTableCells(1, 3) -> IntResult(100),
