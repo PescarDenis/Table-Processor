@@ -28,7 +28,7 @@ class MarkdownPrettyPrinter extends BaseTablePrettyPrinter {
                                     includeRowNumbers: Boolean
                                   ): Seq[String] = {
     rows.iterator.toSeq.groupBy{case (pos, _) => pos.row }.toSeq.sortBy(_._1).map { case (rowIdx, rowCells) =>
-      val rowData = rowCells.toSeq.sortBy(_._1.col).map(_._2)
+      val rowData = rowCells.sortBy(_._1.col).map(_._2)
       if (includeRowNumbers) {
         (Seq(rowIdx.toString) ++ rowData).mkString("| ", " | ", " |")
       } else {
