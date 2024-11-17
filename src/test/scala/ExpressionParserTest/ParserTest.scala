@@ -10,11 +10,12 @@ import TableParser.ParseTableCells
 class ParserTest extends AnyFunSuite {
 
   val expressionBuilder = new ExpressionBuilder[Any] // Update with a specific type if required
-
+  var row  = 1 //declare a row and a col for testing purposes
+  var col = 2
   test("test1") {
-    val lexer = new Lexer("1+2*3")
+    val lexer = new Lexer("1+2*3",row,col)
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens, expressionBuilder)
+    val parser = new Parser(tokens, expressionBuilder,row,col)
     val expression = parser.parse()
 
     // Expected AST: (1 + 2) * 3
@@ -30,9 +31,9 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("test2") {
-    val lexer = new Lexer("2 * D4 / A3")
+    val lexer = new Lexer("2 * D4 / A3",row,col)
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens, expressionBuilder)
+    val parser = new Parser(tokens, expressionBuilder,row,col)
     val expression = parser.parse()
 
     // Expected AST: (2 * D4) / A3
@@ -48,9 +49,9 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("test3") {
-    val lexer = new Lexer("3+5*4/3")
+    val lexer = new Lexer("3+5*4/3",row,col)
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens, expressionBuilder)
+    val parser = new Parser(tokens, expressionBuilder,row,col)
     val expression = parser.parse()
 
     // Expected AST: ((3 + 5) * 4) / 3
@@ -69,9 +70,9 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("test4") {
-    val lexer = new Lexer("A1 - 5 * B1 / 2")
+    val lexer = new Lexer("A1 - 5 * B1 / 2",row,col)
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens, expressionBuilder)
+    val parser = new Parser(tokens, expressionBuilder,row,col)
     val expression = parser.parse()
 
     // Expected AST: ((A1 - 5) * B1) / 2
@@ -90,14 +91,14 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("test5") {
-    val lexer = new Lexer("3++2")
+    val lexer = new Lexer("3++2",row,col)
     val tokens = lexer.tokenize()
-    val parser = new Parser(tokens, expressionBuilder)
+    val parser = new Parser(tokens, expressionBuilder,row,col)
 
     val exception = intercept[IllegalArgumentException] {
       parser.parse()
     }
-
-    assert(exception.getMessage.contains("Unexpected operator at position"))
+    val pos = 2
+    assert(exception.getMessage.contains(s"Unexpected operator at position $pos in cell ($row, $col)."))
   }
 }

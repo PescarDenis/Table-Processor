@@ -22,8 +22,9 @@ object Main {
       printWelcomeMessage()
       return
     }
-    PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
-    PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
+    val printerRegistry = new PrettyPrinterRegistry()
+    printerRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+    printerRegistry.register("md", _ => new MarkdownPrettyPrinter())
     cli.parse(args.toList) match {
       case Some(config) =>
         try {
@@ -42,7 +43,7 @@ object Main {
           val rangedModel = new RangeSelector(config, filteredModel).selectRange()
 
           // Step 5: Output the table in the specified format
-          new TableOutput(config, rangedModel).output()
+          new TableOutput(config, rangedModel,printerRegistry).output()
         } catch {
           case ex: Exception =>
             println(s"An error occurred: ${ex.getMessage}")

@@ -2,5 +2,5 @@ package ExpressionParser.ParsingServices
 
 import ExpressionAST.Expression
 trait ExpressionParser {
-    def parseExpression(exprStr : String) : Expression[?]
+  def parseExpression(expressionStr: String, row: Int, col: Int): Expression[?] 
 }

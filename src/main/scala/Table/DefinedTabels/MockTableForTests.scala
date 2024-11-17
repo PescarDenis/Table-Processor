@@ -8,6 +8,8 @@ import ExpressionParser.ParsingServices.DefaultExpressionParser
 import Table.TableModel
 import Filters.Row
 
+//this is a mock table used for testing
+//it just overwrites some of the Base table methods used for gettting or setting the data
 class MockTableForTests(
                          initialData: Map[ParseTableCells, EvaluationResult[?]]
                        ) extends BaseTable(new FileParser(new DefaultExpressionParser(new ExpressionBuilder))) {

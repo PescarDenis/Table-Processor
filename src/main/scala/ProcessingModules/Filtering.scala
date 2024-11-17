@@ -25,7 +25,7 @@ class Filtering(config: CLIConfig, table: BaseTable) {
     val filteredCells = table.nonEmptyPositions.filter(cell => filteredRowIndices.contains(cell.row))
     val filteredData = filteredCells.map(cell => cell -> table.getEvaluatedResult(cell).get).toMap
 
-    new TableModel(filteredData)
+    new TableModel(filteredData) //return a new table model of evaluated results
   }
 }
 

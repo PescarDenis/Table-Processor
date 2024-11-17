@@ -25,12 +25,12 @@ object ParseTableCells {
       case _ => None
     }
   }
-  
+
   def getColName(col: Int): String = {
     var temp = col - 1 // Shift down for 1-based indexing
     var colName = ""
     while (temp >= 0) {
-      colName = LETTERS.charAt(temp % LETTERS.length) + colName
+      colName = s"${LETTERS.charAt(temp % LETTERS.length)}$colName"
       temp = temp / LETTERS.length - 1
     }
     colName

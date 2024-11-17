@@ -9,10 +9,11 @@ case class ValueFilter(column: String, operator: String, value: Double) extends 
     row.getCellByColumnName(column) match {
       case Some(IntResult(cellValue))  => applyOperator(cellValue.toDouble, value)
       case Some(FloatResult(cellValue)) => applyOperator(cellValue, value)
-      case _ => false
+      case Some(_) => false //if you apply a value filter to an empty results cell just returns false
+      case None => throw new FilterError(s"The given column $column does not exists in the table") //the same goes for the value filter if we don't find the collumn
     }
   }
-
+  //helper method to apply the given operators
   private def applyOperator(cellValue: Double, targetValue: Double): Boolean = {
     operator match {
       case "<"  => cellValue < targetValue
@@ -21,7 +22,7 @@ case class ValueFilter(column: String, operator: String, value: Double) extends 
       case ">=" => cellValue >= targetValue
       case "==" => cellValue == targetValue
       case "!=" => cellValue != targetValue
-      case _    => false
+      case _    => throw new FilterError(s"Unsupported filtering operator: $operator")
     }
   }
 }

@@ -31,7 +31,9 @@ class FileParser(parser: ExpressionParser) extends TableParser {
         numberEntry.set(cellValue)
         numberEntry
       } catch {
-        case _: NumberFormatException => Empty(rowIndex, colIndex)
+        case _: NumberFormatException => throw new IllegalArgumentException(
+          s"Invalid cell content at ($rowIndex,$colIndex): '$cellValue'. Expected a number, formula, or empty cell."
+        )
       }
     }
   }

@@ -3,26 +3,43 @@ package ProcessingModules
 import CLIInterface.CLIConfig
 import File_Reader.CSVSeparator
 import PrettyPrint.{PrettyPrinterRegistry, TablePrinter}
-import OutputDestination.{FileOutputHandler, StdoutOutputHandler}
+import OutputDestination.{FileOutputHandler, StdoutOutputHandler, OutputHandler}
 import Table.TableModel
 
-class TableOutput(config: CLIConfig, rangedModel: TableModel[String]) {
+class TableOutput(config: CLIConfig, rangedModel: TableModel[String], printerRegistry: PrettyPrinterRegistry) {
 
   def output(): Unit = {
     val separator = CSVSeparator(config.outputSeparator)
-    val prettyPrinter = PrettyPrinterRegistry.getPrinter(config.outputFormat, separator)
+    val prettyPrinter = printerRegistry.getPrinter(config.outputFormat, separator)
 
-    val outputHandler = config.outputFile match {
-      case Some(filePath) => new FileOutputHandler(filePath)
-      case None if config.outputToStdout => new StdoutOutputHandler
-      case _ =>
-        println("No output destination specified.")
-        return
+    // Prepare all output handlers based on the configuration
+    val outputHandlers = getOutputHandlers(config)
+
+    if (outputHandlers.isEmpty) {
+      println("No output destination specified.")
+      return
     }
 
     val tablePrinter = new TablePrinter(prettyPrinter)
-    tablePrinter.printTable(rangedModel, outputHandler, config.headers)
+
+    // Print the table using all specified output handlers
+    outputHandlers.foreach { handler =>
+      tablePrinter.printTable(rangedModel, handler, config.headers)
+    }
+  }
+//helper method to collect both stdout and output file handlers
+//in case we specify the output file, the table will also be printed to the stdout as it is always true by default
+  private def getOutputHandlers(config: CLIConfig): List[OutputHandler] = {
+    val handlers = List.newBuilder[OutputHandler]
+
+    if (config.outputToStdout) {
+      handlers += new StdoutOutputHandler()
+    }
+
+    config.outputFile.foreach { filePath =>
+      handlers += new FileOutputHandler(filePath)
+    }
+
+    handlers.result()
   }
 }
-
-

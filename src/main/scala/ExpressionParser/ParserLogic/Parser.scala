@@ -3,14 +3,16 @@ package ExpressionParser.ParserLogic
 import ExpressionAST.Expression
 import ExpressionParser.LexerLogic._
 
-class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterface[T]) {
+class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterface[T], row: Int, col: Int) {
 
   private var pos = 0
   private var lastWasOperator = true
   private var lastOperator: String = ""
 
   def parse(): Expression[T] = {
-    if (tokens.isEmpty) throw new IllegalArgumentException("No tokens to parse")
+    if (tokens.isEmpty) {
+      throw new IllegalArgumentException(s"No tokens to parse in cell ($row, $col).")
+    }
     parseTokens()
   }
 
@@ -36,17 +38,17 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
           lastOperator = op
           lastWasOperator = true
 
-        case _ =>
-          throw new IllegalArgumentException(s"Unexpected token at position $pos")
       }
       pos += 1
     }
 
     if (lastWasOperator) {
-      throw new IllegalArgumentException("Expression ends with an operator")
+      throw new IllegalArgumentException(s"Expression ends with an operator in cell ($row, $col).")
     }
 
-    currentExpression.getOrElse(throw new IllegalArgumentException("No valid expressions found"))
+    currentExpression.getOrElse(
+      throw new IllegalArgumentException(s"No valid expressions found in cell ($row, $col).")
+    )
   }
 
   private def combineExpressions(current: Option[Expression[T]], next: Expression[T]): Option[Expression[T]] = {
@@ -57,10 +59,15 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
   }
 
   private def validateOperand(): Unit = {
-    if (!lastWasOperator) throw new IllegalArgumentException(s"Unexpected operand at position $pos")
+    if (!lastWasOperator) {
+      throw new IllegalArgumentException(s"Unexpected operand at position $pos in cell ($row, $col).")
+    }
   }
 
   private def validateOperator(): Unit = {
-    if (lastWasOperator) throw new IllegalArgumentException(s"Unexpected operator at position $pos")
+    if (lastWasOperator) {
+      throw new IllegalArgumentException(s"Unexpected operator at position $pos in cell ($row, $col).")
+    }
   }
 }
+

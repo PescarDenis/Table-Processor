@@ -52,11 +52,12 @@ class CSVPrinterTest extends AnyFunSuite {
   val table: TableInterface = new MockTableForTests(data)
 
   // Register PrettyPrinters in the registry
-  PrettyPrinterRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+  val printerRegistry = new PrettyPrinterRegistry()
+  printerRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
 
   test("Normal output with no range/filter, including headers") {
     val mockOutputHandler = new MockOutputHandler()
-    val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
+    val prettyPrinter = printerRegistry.getPrinter("csv", CSVSeparator(","))
 
     val tablePrinter = new TablePrinter(prettyPrinter)
     val stringifiedModel = convertToStringModel(table) // Convert table to TableModel[String]
@@ -77,7 +78,7 @@ class CSVPrinterTest extends AnyFunSuite {
 
   test("Range with headers") {
     val mockOutputHandler = new MockOutputHandler()
-    val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
+    val prettyPrinter = printerRegistry.getPrinter("csv", CSVSeparator(","))
 
     val rangeEvaluator = new TableRangeEvaluator(new TableModel(data))
     val rangedModel = rangeEvaluator.getResultsInRange(ParseTableCells(2, 2), ParseTableCells(4, 4))
@@ -101,7 +102,7 @@ class CSVPrinterTest extends AnyFunSuite {
 
   test("Filter and range selection") {
     val mockOutputHandler = new MockOutputHandler()
-    val prettyPrinter = PrettyPrinterRegistry.getPrinter("csv", CSVSeparator(","))
+    val prettyPrinter = printerRegistry.getPrinter("csv", CSVSeparator(","))
 
     val filter = EmptyCellFilter("E", isEmpty = false)
     val evaluator = new Filters.TableFilterEvaluator(table)

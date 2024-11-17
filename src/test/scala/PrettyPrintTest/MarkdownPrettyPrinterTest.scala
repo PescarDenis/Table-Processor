@@ -23,11 +23,12 @@ class MarkdownPrettyPrinterTest extends AnyFunSuite {
   )
 
   val table = new MockTableForTests(data)
-  PrettyPrinterRegistry.register("md", _ => new MarkdownPrettyPrinter())
+  val printerRegistry = new PrettyPrinterRegistry()
+  printerRegistry.register("md", _ => new MarkdownPrettyPrinter())
 
   test("Markdown Output with Headers") {
     val mockOutputHandler = new MockOutputHandler()
-    val markdownPrettyPrinter = PrettyPrinterRegistry.getPrinter("md", CSVSeparator(",")) // CSVSeparator ignored for Markdown
+    val markdownPrettyPrinter = printerRegistry.getPrinter("md", CSVSeparator(",")) // CSVSeparator ignored for Markdown
     val tablePrinter = new TablePrinter(markdownPrettyPrinter)
 
     val stringifiedModel = new TableModel(data.map {
@@ -48,7 +49,7 @@ class MarkdownPrettyPrinterTest extends AnyFunSuite {
 
   test("Markdown Output with NO Headers") {
     val mockOutputHandler = new MockOutputHandler()
-    val markdownPrettyPrinter = PrettyPrinterRegistry.getPrinter("md", CSVSeparator(",")) // Separator ignored for Markdown
+    val markdownPrettyPrinter = printerRegistry.getPrinter("md", CSVSeparator(",")) // Separator ignored for Markdown
     val tablePrinter = new TablePrinter(markdownPrettyPrinter)
 
     val stringifiedModel = new TableModel(data.map {
@@ -69,7 +70,7 @@ class MarkdownPrettyPrinterTest extends AnyFunSuite {
 
   test("Markdown Output with Filter (C == 1)") {
     val mockOutputHandler = new MockOutputHandler()
-    val markdownPrettyPrinter = PrettyPrinterRegistry.getPrinter("md", CSVSeparator(","))
+    val markdownPrettyPrinter = printerRegistry.getPrinter("md", CSVSeparator(","))
     val filter = ValueFilter("C", "==", 1)
     val evaluator = new Filters.TableFilterEvaluator(table)
     val filteredRows = evaluator.evaluateFilter(filter).zipWithIndex.collect {

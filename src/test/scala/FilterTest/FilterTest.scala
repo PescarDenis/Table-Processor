@@ -25,7 +25,7 @@ class FilterTest extends AnyFunSuite {
     assert(results == expectedResults)
   }
 
-  test("Filter rows where column A == 30") {
+  test("Filter rows where column A != 30") {
     val valueFilter = ValueFilter("A", "!=", 30)
     val results = evaluator.evaluateFilter(table,valueFilter)
     val expectedResults = List(true, true, false, true)
@@ -48,7 +48,6 @@ class FilterTest extends AnyFunSuite {
     
     val results = evaluator.evaluateFilter(table,chainedFilter)
 
-    // Expected output: Only rows meeting both conditions
     val expectedResults = List(false, true, false, false) // Row 2 matches both conditions
     assert(results == expectedResults)
   }
@@ -63,8 +62,41 @@ class FilterTest extends AnyFunSuite {
     // Apply filters with evaluator
     val results = evaluator.evaluateFilter(table,chainedFilter)
 
-    // Expected output: Only rows meeting both conditions
     val expectedResults = List(false, false, false, false) //none of the rows match both conditions
     assert(results == expectedResults)
+  }
+  test("Filter rows where column A >= 10.23 and B == 14.5"){
+    val valueFilterA = ValueFilter("A", ">=", 10.23)
+    val valueFilterB = ValueFilter("B", "==", 14.5)
+
+    // Chain filters with logical AND
+    val evaluator= new TableFilterEvaluator(table)
+    val chainedFilter = ChainedFilter(List(valueFilterA,valueFilterB))
+
+    // Apply filters with evaluator
+    val results = evaluator.evaluateFilter(chainedFilter)
+
+    // Expected output: Only rows meeting both conditions
+    val expectedResults = List(false, true, false, false) //none of the rows match both conditions
+    assert(results == expectedResults)
+  }
+  test("Filter but applying a random argument which is not yet supported") {
+    val valueFilterA = ValueFilter("A", "<3<#<3<3<3", 10.23)
+
+    val evaluatorWithErrors = new TableFilterEvaluator(table)
+    // Apply filters with evaluator
+    val results = evaluatorWithErrors.evaluateFilter(valueFilterA) //the error is that there is an unsupported operator
+
+    assert(results.isEmpty)
+  }
+  test("Apply a filter on a missing collumn")
+  {
+    val valueFilterA = ValueFilter("KK", "<3<#<3<3<3", 10.23) //it works the same for the empty filter
+
+    val evaluatorWithErrors = new TableFilterEvaluator(table)
+    // Apply filters with evaluator
+    val results = evaluatorWithErrors.evaluateFilter(valueFilterA) //the error is that the column kk is not found in the table
+
+    assert(results.isEmpty)
   }
 }

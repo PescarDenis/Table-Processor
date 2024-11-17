@@ -4,14 +4,13 @@ import Evaluation.EvaluationResult
 import org.scalatest.funsuite.AnyFunSuite
 import Evaluation.EvaluationTypes.*
 import Range.TableRangeEvaluator
-import Table.DefinedTabels.MockTableForTests
 import Table.TableModel
 import TableParser.ParseTableCells
 
 class RangeTest extends AnyFunSuite {
 
   // Mock data to simulate table with evaluated results
-  val data: Map[ParseTableCells, EvaluationResult[_]] = Map(
+  val data: Map[ParseTableCells, EvaluationResult[?]] = Map(
     ParseTableCells(1, 1) -> IntResult(10),   // A1
     ParseTableCells(1, 2) -> IntResult(22),   // B1
     ParseTableCells(2, 1) -> FloatResult(20.5), // A2
@@ -108,5 +107,20 @@ class RangeTest extends AnyFunSuite {
     )
 
     assert(defaultRangeResults.toMap == expectedResults)
+  }
+  test("Only emtpty results") {
+    val data: Map[ParseTableCells, EvaluationResult[Any]] = Map(
+      ParseTableCells(1, 1) -> EmptyResult, // A1
+      ParseTableCells(1, 2) -> EmptyResult, // B1
+      ParseTableCells(2, 1) -> EmptyResult, // A2
+      ParseTableCells(2, 2) -> EmptyResult, // B2
+    )
+    val tableModel = new TableModel(data)
+
+    val rangeEvaluator = new TableRangeEvaluator(tableModel)
+
+    val defaultRangeResults = rangeEvaluator.getDefaultRangeResults
+
+    assert(defaultRangeResults.toMap.isEmpty, "Default range should be empty for a table with only empty cells")
   }
 }

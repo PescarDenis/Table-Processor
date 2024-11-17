@@ -1,6 +1,6 @@
 package EvaluationTest
 
-import Evaluation.EvaluationTypes.{EmptyResult, EvaluationError, FloatResult, IntResult}
+import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
 import ExpressionAST.EvaluationContext
@@ -99,7 +99,7 @@ class TableEvaluatorTest extends AnyFunSuite {
     val thrownException = intercept[IllegalArgumentException] {
       table.evaluateAllCells(context)
     }
-
+    assert(thrownException.getMessage.contains("Circular dependency detected at cell: A1"))
     assert(thrownException.getMessage.contains("Circular dependency detected at cell: B1"))
   }
 

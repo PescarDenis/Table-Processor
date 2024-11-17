@@ -1,40 +1,34 @@
 package ExpressionParser.LexerLogic
 
-import ExpressionParser.*
+import ExpressionParser._
 
 import scala.collection.mutable.ListBuffer
 
 // Lexer class responsible for tokenizing an input string into individual tokens
-class Lexer(input: String) {
+class Lexer(input: String, row: Int, col: Int) {
 
-  private var pos = 0 // Position in the input string, used to iterate through the characters
+  private var pos = 0 // Position in the input string
 
-  //get the next token
   def nextToken(): Option[Tokens] = {
     skipWhitespaces()
 
     if (pos >= input.length) None
     else {
       val currentChar = input(pos)
-      //determine the type based on the current char
       if (currentChar.isDigit) {
         Some(parseNumber())
       } else if (currentChar.isLetter) {
         Some(parseReference())
       } else if (isOperator(currentChar)) {
         Some(parseOperator())
-      } else if (currentChar == '(') {
-        pos += 1
-        Some(LeftParenthesis)
-      } else if (currentChar == ')') {
-        pos += 1
-        Some(RightParenthesis)
       } else {
-        throw new IllegalArgumentException(s"Unexpected character at position $pos: '$currentChar'")
+        throw new IllegalArgumentException(
+          s"Unexpected character at position $pos in cell ($row, $col): '$currentChar' for the current expression $input"
+        )
       }
     }
   }
-  //tokenize the input into a list of tokens
+
   def tokenize(): List[Tokens] = {
     val tokens = ListBuffer[Tokens]()
     while (pos < input.length) {
@@ -62,7 +56,7 @@ class Lexer(input: String) {
   private def parseReference(): RefToken = {
     val start = pos
 
-    while (pos < input.length && (input(pos).isLetterOrDigit)) {
+    while (pos < input.length && input(pos).isLetterOrDigit) {
       pos += 1
     }
 
@@ -75,7 +69,5 @@ class Lexer(input: String) {
     OperatorToken(operator)
   }
 
-  private def isOperator(char: Char): Boolean = {
-    Set('+', '-', '*', '/').contains(char)
-  }
+  private def isOperator(char: Char): Boolean = Set('+', '-', '*', '/').contains(char)
 }

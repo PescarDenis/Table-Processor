@@ -18,7 +18,7 @@ import TableParser.ParseTableCells
       col <- startCol to endCol
     } yield ParseTableCells(row, col)
   }.toList
-
+  
   // Calculates the default range based on non-empty cells
   def getDefaultRange(nonEmptyPositions: Iterable[ParseTableCells]): List[ParseTableCells] = {
     if (nonEmptyPositions.isEmpty) {

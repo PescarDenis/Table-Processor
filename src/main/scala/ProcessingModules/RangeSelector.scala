@@ -7,8 +7,8 @@ import Range.TableRangeEvaluator
 import Table.TableModel
 import TableParser.ParseTableCells
 import Table.DefinedTabels.BaseTable
-
-class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResult[_]]) {
+import Range.RangeError
+class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResult[?]]) {
 
   def selectRange(): TableModel[String] = {
     val tableRangeEvaluator = new TableRangeEvaluator(filteredModel)
@@ -21,6 +21,7 @@ class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResul
         val toCell = ParseTableCells.parse(end).getOrElse(
           throw new IllegalArgumentException(s"Invalid end cell reference: $end")
         )
+        validatePositions(fromCell, toCell)
         tableRangeEvaluator.getResultsInRange(fromCell, toCell)
 
       case None =>
@@ -35,7 +36,17 @@ class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResul
     new TableModel(stringifiedResults)
   }
 
-  private def convertToString(result: EvaluationResult[_]): String = {
+  private def validatePositions(fromCell: ParseTableCells, toCell: ParseTableCells): Unit = {
+    val allPositions = filteredModel.toMap.keySet
+    if (!allPositions.contains(fromCell)) {
+      throw new RangeError(s"Start cell $fromCell does not exist in the table.")
+    }
+    if (!allPositions.contains(toCell)) {
+      throw new RangeError(s"End cell $toCell does not exist in the table.")
+    }
+  }
+
+  private def convertToString(result: EvaluationResult[?]): String = {
     result match {
       case IntResult(value)  => value.toString
       case FloatResult(value) => value.toString
