@@ -103,6 +103,28 @@ class TableEvaluatorTest extends AnyFunSuite {
     assert(thrownException.getMessage.contains("Circular dependency detected at cell: B1"))
   }
 
+  test("The formula references to a non existing cell in the table"){
+    val initialData: Map[ParseTableCells, TableEntry] = Map(
+      ParseTableCells(1, 1) -> Formula(1, 1, expressionParser)
+    )
+
+    val tableModel = new TableModel(initialData) // Convert to TableModel
+    val table = new BaseTable(new FileParser(expressionParser))
+    table.initializeRows(tableModel)
+    val context = new EvaluationContext(table)
+
+    context.lookup(ParseTableCells(1, 1)).set("=CC99 + 1")
+
+
+    val thrownException = intercept[IllegalArgumentException] {
+      table.evaluateAllCells(context)
+    }
+
+    assert(thrownException.getMessage.contains("There is no cell found at position CC99"))
+  }
+
+  
+
   test("Table evaluator with no problems") {
     val initialData = Map(
       ParseTableCells(4, 6) ->  Formula(4, 6, expressionParser),

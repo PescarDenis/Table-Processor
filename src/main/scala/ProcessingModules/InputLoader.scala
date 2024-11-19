@@ -3,7 +3,7 @@ package ProcessingModules
 import CLIInterface.CLIConfig
 import File_Reader.{CSVReader, CSVSeparator}
 import Table.DefinedTabels.BaseTable
-import TableParser.{FileParser, TableParser}
+import TableParser.FileParser
 
 import scala.io.Source
 //responsible for loading the table from a specific file, with different separators

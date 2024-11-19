@@ -6,7 +6,6 @@ import Evaluation.EvaluationTypes._
 import Range.TableRangeEvaluator
 import Table.TableModel
 import TableParser.ParseTableCells
-import Table.DefinedTabels.BaseTable
 import Range.RangeError
 class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResult[?]]) {
 

@@ -9,7 +9,7 @@ import TableParser.{FileParser, ParseTableCells}
 import ExpressionParser.ParserLogic.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 
-class TableTest extends AnyFunSuite {
+class TableParserTest extends AnyFunSuite {
 
   // Create an instance of ExpressionParser for testing
   private val expressionParser = new DefaultExpressionParser(new ExpressionBuilder)
@@ -51,5 +51,24 @@ class TableTest extends AnyFunSuite {
     assert(table.getCell(ParseTableCells.parse("C1").get).get == expectedExpression) // C1 = "=A1 + 22"
 
   }
+
+  test("Invalid cell found in the parsing process"){
+    val mockData = List(
+      List("abab","2","3","=A1+22"),
+      List("","2+3","","ccc")
+    )
+
+    val mockCSVReader = new MockCSVReader(mockData)
+
+    // Create a BaseTable and parse the mock CSV data
+    val table = new BaseTable(fileParser)
+    val thrownException = intercept[IllegalArgumentException] {
+      table.parse(mockCSVReader)
+    }
+    // As it founds a cell that is not valid, it just alters the program flows at the first occurrence of it
+    assert(thrownException.getMessage.contains("Invalid cell content at (1,1): 'abab'. Expected a number, formula, or empty cell."))
+
+  }
+
   
 }
