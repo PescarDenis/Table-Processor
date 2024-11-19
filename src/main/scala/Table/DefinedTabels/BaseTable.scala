@@ -20,7 +20,9 @@ class BaseTable(parser: FileParser) extends TableInterface {
   }
 
   override def getCell(pos: ParseTableCells): TableEntry = {
-    rawModel.getCell(pos).getOrElse(Empty(pos.row, pos.col))
+    rawModel.getCell(pos).getOrElse(
+      throw new IllegalArgumentException(s"There is no cell found at position $pos")
+    )
   }
 
   override def getRow(rowIndex: Int): Row = {

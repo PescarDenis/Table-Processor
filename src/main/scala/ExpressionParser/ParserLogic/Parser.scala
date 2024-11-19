@@ -11,7 +11,7 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
 
   def parse(): Expression[T] = {
     if (tokens.isEmpty) {
-      throw new IllegalArgumentException(s"No tokens to parse in cell ($row, $col).")
+      throw new IllegalArgumentException(s"No valid expressions found in cell ($row, $col).")
     }
     parseTokens()
   }
@@ -45,10 +45,9 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
     if (lastWasOperator) {
       throw new IllegalArgumentException(s"Expression ends with an operator in cell ($row, $col).")
     }
-
-    currentExpression.getOrElse(
-      throw new IllegalArgumentException(s"No valid expressions found in cell ($row, $col).")
-    )
+    else {
+      currentExpression.get
+    }
   }
 
   private def combineExpressions(current: Option[Expression[T]], next: Expression[T]): Option[Expression[T]] = {
@@ -60,13 +59,13 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
 
   private def validateOperand(): Unit = {
     if (!lastWasOperator) {
-      throw new IllegalArgumentException(s"Unexpected operand at position $pos in cell ($row, $col).")
+      throw new IllegalArgumentException(s"Unexpected operand in the token list at position $pos in cell ($row, $col).")
     }
   }
 
   private def validateOperator(): Unit = {
     if (lastWasOperator) {
-      throw new IllegalArgumentException(s"Unexpected operator at position $pos in cell ($row, $col).")
+      throw new IllegalArgumentException(s"Unexpected operator in the token list at position $pos in cell ($row, $col).")
     }
   }
 }

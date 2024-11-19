@@ -14,7 +14,7 @@ class FormulaTest extends AnyFunSuite {
 
   private val expressionParser = new DefaultExpressionParser(new ExpressionBuilder)
 
-  test("general case scenario test") {
+  test("Provide a table with numbers, and create a new formula from them") {
     val initialData: Map[ParseTableCells, TableEntry] = Map(
       ParseTableCells(1, 2) -> Number(1, 2), // B1 with no formula (1-based)
       ParseTableCells(1, 3) -> Number(1, 3)  // C1 with no formula (1-based)
@@ -30,7 +30,6 @@ class FormulaTest extends AnyFunSuite {
 
     val formulaA1 = Formula(1, 1, expressionParser)  // Formula for A1 (1-based indexing)
     formulaA1.set("=B1 + C1")
-
     val resultA1 = formulaA1.evaluate(context, Set.empty) // Evaluate with an empty visited set
 
     assert(resultA1 == IntResult(17))
@@ -83,4 +82,15 @@ class FormulaTest extends AnyFunSuite {
         assert(resultA1 == EmptyResult)
     }
   }
+
+  test("Test unset formula throws an error when evaluated") {
+    val formula = Formula(1, 1, expressionParser)
+
+    val exception = intercept[IllegalStateException] {
+      formula.evaluate(new EvaluationContext(new BaseTable(new FileParser(expressionParser))), Set.empty)
+    }
+
+    assert(exception.getMessage.contains("No expression set for cell: (1, 1)"))
+  }
+
 }

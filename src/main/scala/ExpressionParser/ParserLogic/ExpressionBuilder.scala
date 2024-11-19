@@ -21,7 +21,7 @@ class ExpressionBuilder[T] extends ExpressionBuilderInterface[T] {
   override def buildRef(ref: String): CellReferenceExpression[T] = {
     ParseTableCells.parse(ref) match {
       case Some(cell) => CellReferenceExpression[T](cell)
-      case None => throw new IllegalArgumentException(s"Invalid cell reference: $ref")
+      case None => throw new IllegalArgumentException(s"There is no cell found in the table with the given reference : $ref")
     }
   }
 
@@ -32,7 +32,6 @@ class ExpressionBuilder[T] extends ExpressionBuilderInterface[T] {
       case "-" => SubtractExpression[T](left, right)
       case "*" => MultiplyExpression[T](left, right)
       case "/" => DivideExpression[T](left, right)
-      case _ => throw new IllegalArgumentException(s"Unknown operator: $op")
     }
   }
 }

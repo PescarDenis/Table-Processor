@@ -51,4 +51,5 @@ class TableTest extends AnyFunSuite {
     assert(table.getCell(ParseTableCells.parse("C1").get).get == expectedExpression) // C1 = "=A1 + 22"
 
   }
+  
 }

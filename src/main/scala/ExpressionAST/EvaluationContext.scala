@@ -13,7 +13,7 @@ class EvaluationContext(table : TableInterface ){ ///the constructor parameter t
       case entry: TableEntry => entry
     }
   }
-
+  
 }
 
 

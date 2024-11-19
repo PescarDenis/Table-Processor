@@ -23,7 +23,7 @@ class Lexer(input: String, row: Int, col: Int) {
         Some(parseOperator())
       } else {
         throw new IllegalArgumentException(
-          s"Unexpected character at position $pos in cell ($row, $col): '$currentChar' for the current expression $input"
+          s"Unknown character at position $pos in cell ($row, $col): '$currentChar' for the current expression $input"
         )
       }
     }
