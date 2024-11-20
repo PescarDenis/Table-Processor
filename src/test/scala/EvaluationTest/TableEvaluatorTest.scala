@@ -1,6 +1,7 @@
 package EvaluationTest
 
 import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
+import Evaluation.TableEvaluatorError
 import org.scalatest.funsuite.AnyFunSuite
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
 import ExpressionAST.EvaluationContext
@@ -9,7 +10,6 @@ import TableParser.{FileParser, ParseTableCells}
 import ExpressionParser.ParserLogic.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 import Table.TableModel
-
 class TableEvaluatorTest extends AnyFunSuite {
 
   // Create an instance of the ExpressionParser to inject into Formulas
@@ -35,7 +35,7 @@ class TableEvaluatorTest extends AnyFunSuite {
     context.lookup(ParseTableCells(4, 6)).set("=C2 * F13")
     context.lookup(ParseTableCells(2, 1)).set("=Q11 / C2")
 
-    val thrownException = intercept[IllegalArgumentException] {
+    val thrownException = intercept[TableEvaluatorError] {
       table.evaluateAllCells(context)
     }
 
@@ -74,7 +74,7 @@ class TableEvaluatorTest extends AnyFunSuite {
     context.lookup(ParseTableCells(1, 1)).set("=A1 + 1")
 
 
-    val thrownException = intercept[IllegalArgumentException] {
+    val thrownException = intercept[TableEvaluatorError] {
       table.evaluateAllCells(context)
     }
 
@@ -96,7 +96,7 @@ class TableEvaluatorTest extends AnyFunSuite {
     context.lookup(ParseTableCells(1, 2)).set("=A1 + 1")
 
 
-    val thrownException = intercept[IllegalArgumentException] {
+    val thrownException = intercept[TableEvaluatorError] {
       table.evaluateAllCells(context)
     }
     assert(thrownException.getMessage.contains("Circular dependency detected at cell: A1"))

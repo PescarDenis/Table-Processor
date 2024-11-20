@@ -14,17 +14,12 @@ class Lexer(input: String, row: Int, col: Int) {
 
     if (pos >= input.length) None
     else {
-      val currentChar = input(pos)
-      if (currentChar.isDigit) {
-        Some(parseNumber())
-      } else if (currentChar.isLetter) {
-        Some(parseReference())
-      } else if (isOperator(currentChar)) {
-        Some(parseOperator())
-      } else {
-        throw new IllegalArgumentException(
-          s"Unknown character at position $pos in cell ($row, $col): '$currentChar' for the current expression $input" //if we find an unknown char
-          //print the error to the user -> the pos is the actual position in the given string, because the whole expression is treated as a string while lexerizing
+      input(pos) match {
+        case c if c.isDigit => Some(parseNumber())
+        case c if c.isLetter => Some(parseReference())
+        case c if isOperator(c) => Some(parseOperator())
+        case c => throw ExpressionParsingError(
+          s"Unknown character at position $pos in cell ($row, $col): '$c' for the current expression $input"
         )
       }
     }

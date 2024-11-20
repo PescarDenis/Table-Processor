@@ -1,6 +1,7 @@
 package ExpressionParser.ParserLogic
 
 import ExpressionAST.Expression
+import ExpressionParser.ExpressionParsingError
 import ExpressionParser.LexerLogic.*
 import TableParser.ParseTableCells
 
@@ -13,7 +14,7 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
 
   def parse(): Expression[T] = {
     if (tokens.isEmpty) {
-      throw new IllegalArgumentException(s"No valid expressions found in cell ($row, $col).") //if there is no expression to parse for example just = throw an error
+      throw ExpressionParsingError(s"No valid expressions found in cell ($row, $col).") //if there is no expression to parse for example just = throw an error
     }
     parseTokens() // Parse the tokens
   }
@@ -33,7 +34,7 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
         case RefToken(ref) =>
           validateOperand()
           if (!ParseTableCells.parse(ref).isDefined) {
-            throw new IllegalArgumentException(
+            throw ExpressionParsingError(
               s"Unsupported operand : '$ref' in cell ($row, $col)." // If we have an expression and there is an unknown  operand throw an error
             )
           }
@@ -51,7 +52,7 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
     }
 
     if (lastWasOperator) {
-      throw new IllegalArgumentException(s"Expression ends with an operator in cell ($row, $col).") // If the expression ends with an operator
+      throw ExpressionParsingError(s"Expression ends with an operator in cell ($row, $col).") // If the expression ends with an operator
     }
     else {
       currentExpression.get
@@ -68,13 +69,13 @@ class Parser[T](tokens: List[Tokens], expressionBuilder: ExpressionBuilderInterf
 
   private def validateOperand(): Unit = {
     if (!lastWasOperator) {
-      throw new IllegalArgumentException(s"Unexpected operand in the token list at position $pos in cell ($row, $col).")
+      throw ExpressionParsingError(s"Unexpected operand in the token list at position $pos in cell ($row, $col).")
     }
   }
 
   private def validateOperator(): Unit = {
     if (lastWasOperator) {
-      throw new IllegalArgumentException(s"Unexpected operator in the token list at position $pos in cell ($row, $col).")
+      throw ExpressionParsingError(s"Unexpected operator in the token list at position $pos in cell ($row, $col).")
     }
   }
 }

@@ -3,7 +3,7 @@ package ProcessingModulesTests
 import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
 import CLIInterface.CLIConfig
-import Filters.ValueFilter
+import Filters.{FilterError, ValueFilter}
 import ProcessingModules.Filtering
 import Table.DefinedTabels.MockTableForTests
 import TableParser.ParseTableCells
@@ -86,9 +86,11 @@ class FilteringTest extends AnyFunSuite {
     )
 
     val filtering = new Filtering(config, mockTable)
-    val filteredModel = filtering.applyFilters()
+    val filteredModel = intercept[FilterError] {
+      filtering.applyFilters()
+    }
 
-    assert(filteredModel.toMap.isEmpty) //No row matches and the error is thrown in the console
+    assert(filteredModel.getMessage.contains("Unsupported filtering operator: __DD")) //No row matches and the error is thrown in the console
   }
   test("Apply filter with a non existing column in the table") {
 
@@ -99,8 +101,11 @@ class FilteringTest extends AnyFunSuite {
     )
 
     val filtering = new Filtering(config, mockTable)
-    val filteredModel = filtering.applyFilters()
+    val filteredModel = intercept[FilterError] {
+      filtering.applyFilters()
+    }
 
-    assert(filteredModel.toMap.isEmpty) //No row matches and the error is thrown in the console
+
+    assert(filteredModel.getMessage.contains("The given column DDD does not exists in the table")) //No row matches and the error is thrown in the console
   }
 }

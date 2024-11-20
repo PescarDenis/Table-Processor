@@ -2,7 +2,8 @@ package ExpressionParserTest
 
 import Evaluation.EvaluationTypes.{FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
-import ExpressionAST.{ConstantExpression, CellReferenceExpression, AddExpression, SubtractExpression, MultiplyExpression, DivideExpression, EvaluationContext}
+import ExpressionAST.{AddExpression, CellReferenceExpression, ConstantExpression, DivideExpression, EvaluationContext, MultiplyExpression, SubtractExpression}
+import ExpressionParser.ExpressionParsingError
 import ExpressionParser.LexerLogic.Lexer
 import ExpressionParser.ParserLogic.{ExpressionBuilder, Parser}
 import TableParser.ParseTableCells
@@ -95,7 +96,7 @@ class ParserTest extends AnyFunSuite {
     val tokens = lexer.tokenize()
     val parser = new Parser(tokens, expressionBuilder,row,col)
 
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[ExpressionParsingError] {
       parser.parse()
     }
     val pos = 2
@@ -107,7 +108,7 @@ class ParserTest extends AnyFunSuite {
     val tokens = lexer.tokenize()
     val parser = new Parser(tokens,expressionBuilder,row,col)
 
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[ExpressionParsingError] {
       parser.parse()
     }
     val pos = 1
@@ -119,7 +120,7 @@ class ParserTest extends AnyFunSuite {
     val tokens = lexer.tokenize()
     val parser = new Parser(tokens, expressionBuilder, row, col)
 
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[ExpressionParsingError] {
       parser.parse()
     }
     val pos = 5
@@ -131,7 +132,7 @@ class ParserTest extends AnyFunSuite {
     val tokens = lexer.tokenize()
     val parser = new Parser(tokens,expressionBuilder,row,col)
 
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[ExpressionParsingError] {
       parser.parse()
     }
 
@@ -143,7 +144,7 @@ class ParserTest extends AnyFunSuite {
     val tokens = lexer.tokenize()
     val parser = new Parser(tokens, expressionBuilder, row, col)
 
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[ExpressionParsingError] {
       parser.parse()
     }
 

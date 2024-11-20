@@ -6,14 +6,8 @@ import Table.TableInterface
 class TableFilterEvaluator(table: TableInterface) {
 
   def evaluateFilter(filter: TableFilter): List[Boolean] = {
-    try { //tries to evaluate a given table
-      val rowFilterEvaluator = new RowFilterEvaluator()
-      rowFilterEvaluator.evaluateFilter(table, filter)
-    }
-    catch{ //otherwise logs the error 
-      case e: FilterError =>
-        List.empty[Boolean] //return an empty list
-    }
+    val rowFilterEvaluator = new RowFilterEvaluator()
+    rowFilterEvaluator.evaluateFilter(table, filter)
   }
 }
 

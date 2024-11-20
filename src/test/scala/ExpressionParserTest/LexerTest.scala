@@ -1,6 +1,7 @@
 package ExpressionParserTest
 
-import ExpressionParser.LexerLogic.{ Lexer, NumberToken, OperatorToken, RefToken, Tokens}
+import ExpressionParser.ExpressionParsingError
+import ExpressionParser.LexerLogic.{Lexer, NumberToken, OperatorToken, RefToken, Tokens}
 import org.scalatest.funsuite.AnyFunSuite
 
 //Lexer testing
@@ -38,7 +39,7 @@ class LexerTest extends AnyFunSuite{
 
   test("Test with an an unknown token at a position"){
     val lexer = new Lexer("A(+3" ,1 ,1)
-    val thrownException = intercept[IllegalArgumentException]  {
+    val thrownException = intercept[ExpressionParsingError]  {
       val tokens = lexer.tokenize()
     }
     assert(thrownException.getMessage.contains("Unknown character at position 1 in cell (1, 1): '('" +

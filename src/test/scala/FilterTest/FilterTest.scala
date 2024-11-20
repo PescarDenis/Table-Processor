@@ -85,18 +85,22 @@ class FilterTest extends AnyFunSuite {
 
     val evaluatorWithErrors = new TableFilterEvaluator(table)
     // Apply filters with evaluator
-    val results = evaluatorWithErrors.evaluateFilter(valueFilterA) //the error is that there is an unsupported operator
+    val exception = intercept[FilterError]{
+      evaluatorWithErrors.evaluateFilter(valueFilterA)
+    } //the error is that there is an unsupported operator
 
-    assert(results.isEmpty)
+    assert(exception.getMessage.contains("Unsupported filtering operator: <3<#<3<3<3"))
   }
   test("Apply a filter on a missing collumn")
   {
     val valueFilterA = ValueFilter("KK", "<3<#<3<3<3", 10.23) //it works the same for the empty filter
 
     val evaluatorWithErrors = new TableFilterEvaluator(table)
-    // Apply filters with evaluator
-    val results = evaluatorWithErrors.evaluateFilter(valueFilterA) //the error is that the column kk is not found in the table
 
-    assert(results.isEmpty)
+    val exception = intercept[FilterError] {
+      evaluatorWithErrors.evaluateFilter(valueFilterA)
+    }
+
+    assert(exception.getMessage.contains("The given column KK does not exists in the table"))
   }
 }

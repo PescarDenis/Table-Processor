@@ -3,8 +3,8 @@ package Table.TableEntries
 import Evaluation.EvaluationResult
 import ExpressionAST.{Expression, EvaluationContext}
 import ExpressionParser.ParsingServices.ExpressionParser
+import ExpressionParser.ExpressionParsingError
 import TableParser.ParseTableCells
-
 
 // Represents a Formula class, now we pass the parser as a dependency injection inside the formula for better setting
 case class Formula(row: Int, col: Int, parser: ExpressionParser) extends TableEntry {
@@ -16,18 +16,13 @@ case class Formula(row: Int, col: Int, parser: ExpressionParser) extends TableEn
   override def set(value: String): Unit = {
     if (value.startsWith("=")) {
       val expressionStr = value.substring(1).trim // get the expression
-      try {
-        expression = Some(parser.parseExpression(expressionStr, row, col)) // try to parse it
-      } catch {
-        case e: IllegalArgumentException =>
-          throw new IllegalArgumentException(
-            s"${e.getMessage}" // collect the errors
-          )
-      }
-    } else {
-      expression = Some(parser.parseExpression(value, row, col)) // We can also get raw formulas in the table 
+      expression = Some(parser.parseExpression(expressionStr, row, col))
+    }
+    else {
+      expression = Some(parser.parseExpression(value, row, col)) // We can also get raw formulas in the table
     }
   }
+
 
   override def isEmpty: Boolean = expression.isEmpty
 

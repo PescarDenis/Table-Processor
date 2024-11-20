@@ -1,9 +1,4 @@
 package Range
 
 // Collects the Errors for the range selection
-class RangeError(message: String) extends Exception(message) {
-  def logError(): Unit = {
-    println(s"Range Error: $message")
-  }
-}
-
+class RangeError(message: String) extends Exception(message) 

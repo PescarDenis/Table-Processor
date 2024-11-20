@@ -31,7 +31,7 @@ class TableEvaluator(table: TableInterface, context: EvaluationContext) {
 
   private def reportErrorsAndFail(): Unit = {
     val errorMessages = errorCells.map { case (cell, message) => s"$cell: $message" }.mkString("\n") //create the error messages
-    throw new IllegalArgumentException(s"Evaluation failed due to errors in the following cells:\n$errorMessages")
+    throw TableEvaluatorError(s"Evaluation failed due to errors in the following cells:\n$errorMessages")
   }
 }
 
