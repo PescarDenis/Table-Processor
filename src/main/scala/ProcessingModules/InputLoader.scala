@@ -6,7 +6,7 @@ import Table.DefinedTabels.BaseTable
 import TableParser.FileParser
 
 import scala.io.Source
-//responsible for loading the table from a specific file, with different separators
+// Responsible for loading the table from a specific file, with different separators
 
 class InputLoader(config: CLIConfig, parser: FileParser) {
 

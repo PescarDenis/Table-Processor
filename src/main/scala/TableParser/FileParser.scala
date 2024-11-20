@@ -5,8 +5,9 @@ import File_Reader.CSVReader
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
 import Table.TableModel
 
+//Knows how to parse a file
 class FileParser(parser: ExpressionParser) extends TableParser {
-
+  
   override def parse(data: CSVReader): TableModel[TableEntry] = {
     val entries = data.zipWithIndex.flatMap { case (row, rowIndex) =>
       row.zipWithIndex.map { case (cellValue, colIndex) =>
@@ -17,7 +18,8 @@ class FileParser(parser: ExpressionParser) extends TableParser {
 
     new TableModel(entries)
   }
-
+    
+  // Helper method to parse each cell based on its entry formula,number or empty cell
     private def parseCell(cellValue: String, rowIndex: Int, colIndex: Int): TableEntry = {
     if (cellValue.trim.isEmpty) {
       Empty(rowIndex, colIndex)
@@ -30,9 +32,9 @@ class FileParser(parser: ExpressionParser) extends TableParser {
         val numberEntry = Number(rowIndex, colIndex)
         numberEntry.set(cellValue)
         numberEntry
-      } catch {
-        case _: NumberFormatException => throw new IllegalArgumentException(
-          s"Invalid cell content at ($rowIndex,$colIndex): '$cellValue'. Expected a number, formula, or empty cell."
+      } catch { //If we try to parse some unknown entry throw an error  
+        case _: NumberFormatException => throw new NumberFormatException(
+          s"Invalid cell content at ($rowIndex,$colIndex): '$cellValue'. Expected an integer positive number, formula, or empty cell."
         )
       }
     }

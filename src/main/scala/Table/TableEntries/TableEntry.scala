@@ -4,6 +4,7 @@ import Evaluation.EvaluationResult
 import ExpressionAST.EvaluationContext
 import TableParser.ParseTableCells
 
+//Interface for table entries 
 trait TableEntry {
   def get: String  // Return a string representation of the value
   def set(value: String): Unit // Set the value, parsing if necessary

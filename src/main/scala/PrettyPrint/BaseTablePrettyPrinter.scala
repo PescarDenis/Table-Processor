@@ -1,8 +1,8 @@
 package PrettyPrint
 
 import Table.TableModel
-import TableParser.ParseTableCells
 
+// Defines the common methods used for CSV,MD or any other format
 abstract class BaseTablePrettyPrinter extends PrettyPrinter {
 
   // Abstract methods for formatting headers and rows

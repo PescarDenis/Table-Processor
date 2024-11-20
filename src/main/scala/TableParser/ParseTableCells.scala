@@ -18,8 +18,7 @@ object ParseTableCells {
     str match {
       case pattern(columnStr, rowStr) =>
         val rowIndex = rowStr.toInt // Keep rowIndex 1-based directly
-        if (rowIndex < 1) return None   // Reject invalid rows (like "0" or less)
-
+        
         val colIndex = getColIndex(columnStr)
         Some(ParseTableCells(rowIndex, colIndex)) // Both row and column are 1-based
       case _ => None

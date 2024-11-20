@@ -10,7 +10,7 @@ class TableFilterEvaluator(table: TableInterface) {
       val rowFilterEvaluator = new RowFilterEvaluator()
       rowFilterEvaluator.evaluateFilter(table, filter)
     }
-    catch{ //otherwise logs the error and return an empty list of booleans
+    catch{ //otherwise logs the error 
       case e: FilterError =>
         List.empty[Boolean] //return an empty list
     }

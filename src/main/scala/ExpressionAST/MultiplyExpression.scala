@@ -12,7 +12,7 @@ case class MultiplyExpression[T](left: Expression[T], right: Expression[T]) exte
         EvaluationError("Empty cell in arithmetic operation") // Error for empty cells
       case (EvaluationError(msg), _) =>
         EvaluationError(msg)
-      case (_, EvaluationError(msg)) =>
+      case (_, EvaluationError(msg)) => // Used for getting the error messages when the cyclical dependencies are detected
         EvaluationError(msg)
 
 

@@ -2,6 +2,7 @@ package PrettyPrint
 import Table.TableModel
 import OutputDestination.OutputHandler
 
+//Prints the final table where we want to 
 class TablePrinter(prettyPrinter: PrettyPrinter) {
 
   def printTable(

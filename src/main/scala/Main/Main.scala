@@ -46,7 +46,7 @@ object Main {
           new TableOutput(config, rangedModel,printerRegistry).output()
         } catch {
           case ex: Exception =>
-            println(s"An error occurred: ${ex.getMessage}")
+            println(s"An error occurred: ${ex.getMessage}") // Print the errors 
         }
 
       case None =>

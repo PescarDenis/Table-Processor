@@ -19,10 +19,9 @@ class ExpressionBuilder[T] extends ExpressionBuilderInterface[T] {
 
   // Builds a reference expression based on a cell reference like A1 or B2
   override def buildRef(ref: String): CellReferenceExpression[T] = {
-    ParseTableCells.parse(ref) match {
-      case Some(cell) => CellReferenceExpression[T](cell)
-      case None => throw new IllegalArgumentException(s"There is no cell found in the table with the given reference : $ref")
-    }
+    // At this point, the `ref` is guaranteed to be valid, because the error is treated in the Parser
+    val cell = ParseTableCells.parse(ref).get
+    CellReferenceExpression[T](cell)
   }
 
   // Builds a binary operation expression based on the operator and its operands

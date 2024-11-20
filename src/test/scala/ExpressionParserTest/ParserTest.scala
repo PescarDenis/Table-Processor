@@ -125,8 +125,9 @@ class ParserTest extends AnyFunSuite {
     val pos = 5
     assert(exception.getMessage.contains(s"Unexpected operand in the token list at position $pos in cell ($row, $col)."))
   }
-  test("No valid cell reference in the table"){
-    val lexer = new Lexer("a1231-2",row,col)
+  test("No supported operand for this type"){
+    val lexer = new Lexer("a1231-2",row,col) //a12131 is treated as an operand, as it not a valid cell in the table like C2, C3, A4 ...
+    //also A,B,C,D will be treated as operands as again they are not valid cells
     val tokens = lexer.tokenize()
     val parser = new Parser(tokens,expressionBuilder,row,col)
 
@@ -134,7 +135,7 @@ class ParserTest extends AnyFunSuite {
       parser.parse()
     }
 
-    assert(exception.getMessage.contains("There is no cell found in the table with the given reference : a1231"))
+    assert(exception.getMessage.contains(s"Unsupported operand : 'a1231' in cell ($row, $col)"))
 
   }
   test("No valid expression found in the cell") {

@@ -62,11 +62,11 @@ class TableParserTest extends AnyFunSuite {
 
     // Create a BaseTable and parse the mock CSV data
     val table = new BaseTable(fileParser)
-    val thrownException = intercept[IllegalArgumentException] {
+    val thrownException = intercept[NumberFormatException] {
       table.parse(mockCSVReader)
     }
     // As it founds a cell that is not valid, it just alters the program flows at the first occurrence of it
-    assert(thrownException.getMessage.contains("Invalid cell content at (1,1): 'abab'. Expected a number, formula, or empty cell."))
+    assert(thrownException.getMessage.contains("Invalid cell content at (1,1): 'abab'. Expected an integer positive number, formula, or empty cell."))
 
   }
 

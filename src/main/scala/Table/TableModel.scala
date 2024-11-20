@@ -17,7 +17,7 @@ class TableModel[T](private val data: Map[ParseTableCells, T]) {
   // Get all entries as a map
   def toMap: Map[ParseTableCells, T] = data
 
-  //was supposed to be for all the non empty value, but actually just returns all of the values in the table 
+  // Was supposed to be for all the non empty value, but actually just returns all of the values in the table
   def nonEmptyPositions: Iterable[ParseTableCells] = data.keys
 
   // Iterator for traversing the data

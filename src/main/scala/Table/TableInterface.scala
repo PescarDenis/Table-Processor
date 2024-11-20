@@ -6,7 +6,7 @@ import File_Reader.CSVReader
 import Table.TableEntries.*
 import TableParser.ParseTableCells
 import Filters.Row
-// Generic interface for a table
+// A Table interface that defines some basic methods of getting and some setting for a table 
 trait TableInterface {
 
   def getCell(pos: ParseTableCells): TableEntry

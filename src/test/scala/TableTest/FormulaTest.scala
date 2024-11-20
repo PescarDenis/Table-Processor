@@ -10,6 +10,7 @@ import Table.DefinedTabels.{BaseTable, MockTableForTests}
 import TableParser.{FileParser, ParseTableCells}
 import Table.TableModel
 
+//the errors are handled properly in the table evaluator
 class FormulaTest extends AnyFunSuite {
 
   private val expressionParser = new DefaultExpressionParser(new ExpressionBuilder)

@@ -1,7 +1,6 @@
 package ExpressionAST
 
 import Table.TableEntries.TableEntry
-import Table.TableEntries.Empty
 import TableParser.ParseTableCells
 import Table.TableInterface
 //component for evaluating expressions within the context of a table

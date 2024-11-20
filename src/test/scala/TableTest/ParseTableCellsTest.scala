@@ -13,7 +13,7 @@ class ParseTableCellsTest extends AnyFunSuite {
 
   test("test valid basic inputs") {
     assert(ParseTableCells.parse("B12").contains(ParseTableCells(12, 2)))
-    assert(ParseTableCells.parse("A0").isEmpty)
+    assert(ParseTableCells.parse("A1").contains(ParseTableCells(1,1)))
     assert(ParseTableCells.parse("C9").contains(ParseTableCells(9, 3)))
     assert(ParseTableCells.parse("AA201").contains(ParseTableCells(201, 27)))
   }

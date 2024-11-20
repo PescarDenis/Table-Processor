@@ -138,7 +138,7 @@ class InputLoaderTest extends AnyFunSuite with BeforeAndAfter {
       loader.loadTable()
     }
     //it will just blow up, because the whole thing is treated as a non valid cell
-    assert(thrown.getMessage.contains("Invalid cell content at (2,1): '4; 5'. Expected a number, formula, or empty cell."))
+    assert(thrown.getMessage.contains("Invalid cell content at (2,1): '4; 5'. Expected an integer positive number, formula, or empty cell."))
 
     customSeparatorFile.delete()
   }

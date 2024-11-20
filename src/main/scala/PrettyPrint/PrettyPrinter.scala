@@ -1,7 +1,5 @@
 package PrettyPrint
-import Table.{TableInterface, TableModel}
-import Filters.TableFilter
-import TableParser.ParseTableCells
+import Table.TableModel
 
 ///base interface that allows the user to print the table in different formats
 trait PrettyPrinter {

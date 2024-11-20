@@ -10,7 +10,7 @@ case class AddExpression[T](left: Expression[T], right: Expression[T]) extends B
     (leftValue, rightValue) match {
       case (EmptyResult, _) | (_, EmptyResult) =>
         EvaluationError("Empty cell in arithmetic operation") // Error for empty cells
-      case (EvaluationError(msg), _) =>
+      case (EvaluationError(msg), _) => // Used for getting the error messages when the cyclical dependencies are detected 
         EvaluationError(msg)
       case (_, EvaluationError(msg)) =>
         EvaluationError(msg)

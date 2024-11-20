@@ -10,7 +10,7 @@ case class DivideExpression[T](left: Expression[T], right: Expression[T]) extend
     (leftValue, rightValue) match {
       case (EmptyResult, _) | (_, EmptyResult) =>
         EvaluationError("Empty cell in arithmetic operation") // Error for empty cells
-      case (EvaluationError(msg), _) =>
+      case (EvaluationError(msg), _) => // Used for getting the error messages when the cyclical dependencies are detected
         EvaluationError(msg)
       case (_, EvaluationError(msg)) =>
         EvaluationError(msg)
@@ -29,8 +29,8 @@ case class DivideExpression[T](left: Expression[T], right: Expression[T]) extend
       case (FloatResult(l), IntResult(r)) if r != 0 =>
         FloatResult(l / r.toDouble)
 
-      case (IntResult(_), IntResult(0)) | (FloatResult(_), FloatResult(0.0)) =>
-        throw new ArithmeticException("Division by zero") //division by 0 should not be supported
+      case (IntResult(_), IntResult(0)) | (FloatResult(_), FloatResult(0.0)) | (IntResult(_),FloatResult(0.0)) | (FloatResult(_),IntResult(0))  =>
+        EvaluationError("Division by zero is not supported") //division by 0 should not be supported
 
       case _ =>
         EvaluationError("Unsupported operation between these types")

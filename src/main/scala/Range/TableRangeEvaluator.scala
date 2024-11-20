@@ -2,7 +2,7 @@ package Range
 
 import Evaluation.EvaluationResult
 import Evaluation.EvaluationTypes.EmptyResult
-import Table.{TableInterface, TableModel}
+import Table.TableModel
 import TableParser.ParseTableCells
 
 // Evaluates ranges by interacting with the table's existing interface

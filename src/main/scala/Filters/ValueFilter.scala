@@ -22,7 +22,7 @@ case class ValueFilter(column: String, operator: String, value: Double) extends 
       case ">=" => cellValue >= targetValue
       case "==" => cellValue == targetValue
       case "!=" => cellValue != targetValue
-      case _    => throw new FilterError(s"Unsupported filtering operator: $operator")
+      case _    => throw new FilterError(s"Unsupported filtering operator: $operator") // If the operator is not defined 
     }
   }
 }
