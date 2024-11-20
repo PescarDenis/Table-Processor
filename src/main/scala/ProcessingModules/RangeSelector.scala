@@ -15,10 +15,10 @@ class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResul
     val rangeResults = config.range match {
       case Some((start, end)) =>
         val fromCell = ParseTableCells.parse(start).getOrElse(
-          throw new IllegalArgumentException(s"Invalid start cell reference: $start")
+          throw new RangeError(s"Invalid start cell reference: $start")
         )
         val toCell = ParseTableCells.parse(end).getOrElse(
-          throw new IllegalArgumentException(s"Invalid end cell reference: $end")
+          throw new RangeError(s"Invalid end cell reference: $end")
         )
         validatePositions(fromCell, toCell)
         tableRangeEvaluator.getResultsInRange(fromCell, toCell)
@@ -50,7 +50,6 @@ class RangeSelector(config: CLIConfig, filteredModel: TableModel[EvaluationResul
       case IntResult(value)  => value.toString
       case FloatResult(value) => value.toString
       case EmptyResult        => ""
-      case _                 => "ERROR" // This should never happen with valid evaluations
     }
   }
 }
