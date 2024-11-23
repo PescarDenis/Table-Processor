@@ -1,4 +1,6 @@
-package CLIInterface
+package CLIInterface.Visitors
+
+import CLIInterface.Handlers.ParameterHandler
 
 //Defines the interface for a visitor
 trait CLIVisitor {

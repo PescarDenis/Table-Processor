@@ -1,4 +1,7 @@
-package CLIInterface
+package CLIInterface.Visitors
+
+import CLIInterface.Handlers.ParameterHandler
+
 
 //Builds a help message by visiting each parameter handler
 class HelpVisitor extends CLIVisitor {
