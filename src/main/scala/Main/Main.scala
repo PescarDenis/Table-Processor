@@ -23,7 +23,7 @@ object Main {
       return
     }
     val printerRegistry = new PrettyPrinterRegistry()
-    printerRegistry.register("csv", sep => new CSVPrettyPrinter(sep))
+    printerRegistry.register("csv", sep =>  CSVPrettyPrinter(sep))
     printerRegistry.register("md", _ => new MarkdownPrettyPrinter())
     cli.parse(args.toList) match {
       case Some(config) =>

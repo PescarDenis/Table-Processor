@@ -11,7 +11,7 @@ class DefaultExpressionParser(expressionBuilder: ExpressionBuilderInterface[?]) 
   override def parseExpression(expressionStr: String, row: Int, col: Int): Expression[?] = {
     val lexer = new Lexer(expressionStr, row, col) //Create the lexer
     val tokens = lexer.tokenize() // Create the token list
-    val parser = new Parser(tokens, expressionBuilder, row, col) // Create the Parser
+    val parser =  Parser(tokens, expressionBuilder, row, col) // Create the Parser
     parser.parse() // Parser the expression
   }
 }
