@@ -116,7 +116,8 @@ class InputLoaderTest extends AnyFunSuite with BeforeAndAfter {
     val thrown = intercept[Exception] {
       loader.loadTable()
     }
-    assert(thrown.getMessage.contains("The system cannot find the file specified"))
+    println(s"Exception message: ${thrown.getMessage}")
+    assert(thrown.getMessage.contains("nonexistent.csv")) //It will throw an error but it really depends on the OS that the users has
   }
 
   test("Load a table with defalut :: separator but introduce a ; somewhere"){
