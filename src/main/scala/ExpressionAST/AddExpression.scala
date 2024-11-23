@@ -23,8 +23,6 @@ case class AddExpression[T](left: Expression[T], right: Expression[T]) extends B
         FloatResult(l + r) // Promote Int to Float and add
       case (FloatResult(l), IntResult(r)) =>
         FloatResult(l + r) // Promote Int to Float and add
-      case _ =>
-        EvaluationError("Unsupported operation between these types")
     }
   }
 }

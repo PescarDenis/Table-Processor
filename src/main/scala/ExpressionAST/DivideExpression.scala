@@ -32,8 +32,6 @@ case class DivideExpression[T](left: Expression[T], right: Expression[T]) extend
       case (IntResult(_), IntResult(0)) | (FloatResult(_), FloatResult(0.0)) | (IntResult(_),FloatResult(0.0)) | (FloatResult(_),IntResult(0))  =>
         EvaluationError("Division by zero is not supported") //division by 0 should not be supported
 
-      case _ =>
-        EvaluationError("Unsupported operation between these types")
     }
   }
 }

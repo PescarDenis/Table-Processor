@@ -23,8 +23,6 @@ case class SubtractExpression[T](left: Expression[T], right: Expression[T]) exte
         FloatResult(l - r) // Promote Int to Float and subtract
       case (FloatResult(l), IntResult(r)) =>
         FloatResult(l - r) // Promote Int to Float and subtract
-      case _ =>
-        EvaluationError("Unsupported operation between these types")
     }
   }
 }

@@ -23,9 +23,8 @@ case class MultiplyExpression[T](left: Expression[T], right: Expression[T]) exte
       case (IntResult(l), FloatResult(r)) =>
         FloatResult(l * r) // Promote Int to Float and multiply
       case (FloatResult(l), IntResult(r)) =>
-        FloatResult(l * r).asInstanceOf[EvaluationResult[T]] // Promote Int to Float and multiply
-      case _ =>
-        EvaluationError("Unsupported operation between these types")
+        FloatResult(l * r)
+
     }
   }
 }
