@@ -1,7 +1,7 @@
-package ExpressionParser.ParserLogic
+package ExpressionParser.ParserLogic.ExpressionBuilder
 
-import Evaluation.EvaluationTypes.{FloatResult, IntResult}
 import Evaluation.EvaluationResult
+import Evaluation.EvaluationTypes.{FloatResult, IntResult}
 import ExpressionAST.*
 import TableParser.ParseTableCells
 
