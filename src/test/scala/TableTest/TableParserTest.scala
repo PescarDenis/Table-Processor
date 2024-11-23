@@ -4,9 +4,9 @@ import Evaluation.EvaluationTypes.IntResult
 import org.scalatest.funsuite.AnyFunSuite
 import File_Reader.MockCSVReader
 import ExpressionAST.{AddExpression, CellReferenceExpression, ConstantExpression}
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import Table.DefinedTabels.BaseTable
 import TableParser.{FileParser, ParseTableCells}
-import ExpressionParser.ParserLogic.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 
 class TableParserTest extends AnyFunSuite {

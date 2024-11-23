@@ -13,9 +13,9 @@ case class Number(row: Int, col: Int) extends TableEntry {
   override def get: String = value.map(_.toString).getOrElse("")
 
   override def set(newValue: String): Unit = {
-    val intValue = newValue.trim.toInt
+    val intValue = newValue.trim.toInt //get the value that we set into an int
     if (intValue < 0) {
-      throw new IllegalArgumentException(s"Invalid value for Number entry at ($row, $col): $intValue (must be a positive integer)")
+      throw new IllegalArgumentException(s"Invalid value for Number entry at ($row, $col): $intValue (must be a positive integer)") // if there are
     }
     value = Some(intValue)
   }

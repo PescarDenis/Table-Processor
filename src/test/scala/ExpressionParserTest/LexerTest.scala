@@ -11,7 +11,7 @@ class LexerTest extends AnyFunSuite{
 
     val lexer = new Lexer("1+2*3",1,1)
     val tokens = lexer.tokenize()
-    assert(tokens == List (
+    assert(tokens == Seq (
       NumberToken("1"),
       OperatorToken("+"),
       NumberToken("2"),
@@ -24,7 +24,7 @@ class LexerTest extends AnyFunSuite{
 
     val lexer = new Lexer("A1+B2+C3/D12/3",213,1231)
     val tokens = lexer.tokenize()
-    assert(tokens == List(
+    assert(tokens == Seq(
       RefToken("A1"),
       OperatorToken("+"),
       RefToken("B2"),
@@ -42,8 +42,7 @@ class LexerTest extends AnyFunSuite{
     val thrownException = intercept[ExpressionParsingError]  {
       val tokens = lexer.tokenize()
     }
-    assert(thrownException.getMessage.contains("Unknown character at position 1 in cell (1, 1): '('" +
-      " for the current expression A(+3"))
+    assert(thrownException.getMessage.contains("Unknown character '(' at position 1 in cell (1, 1) for the current expression A(+3"))
   }
 
 }

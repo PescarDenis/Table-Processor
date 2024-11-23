@@ -5,9 +5,9 @@ import Evaluation.TableEvaluatorError
 import org.scalatest.funsuite.AnyFunSuite
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
 import ExpressionAST.EvaluationContext
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import Table.DefinedTabels.BaseTable
 import TableParser.{FileParser, ParseTableCells}
-import ExpressionParser.ParserLogic.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 import Table.TableModel
 class TableEvaluatorTest extends AnyFunSuite {

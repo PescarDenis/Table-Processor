@@ -4,7 +4,7 @@ import Table.TableModel
 import File_Reader.CSVSeparator
 import TableParser.ParseTableCells
 
-class CSVPrettyPrinter(separator: CSVSeparator) extends BaseTablePrettyPrinter {
+case class CSVPrettyPrinter(separator: CSVSeparator) extends BaseTablePrettyPrinter {
   override protected def buildHeaders(
                                        cols: Seq[Int],
                                        includeHeaders: Boolean

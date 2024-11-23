@@ -2,7 +2,8 @@ package ExpressionParser.ParsingServices
 
 import ExpressionAST.Expression
 import ExpressionParser.LexerLogic.Lexer
-import ExpressionParser.ParserLogic.{ExpressionBuilderInterface, Parser}
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilderInterface
+import ExpressionParser.ParserLogic.ParserStates.Parser
 
 // Knows how to parse an expression
 class DefaultExpressionParser(expressionBuilder: ExpressionBuilderInterface[?]) extends ExpressionParser {

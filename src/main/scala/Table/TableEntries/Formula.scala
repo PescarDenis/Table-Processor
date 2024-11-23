@@ -15,7 +15,7 @@ case class Formula(row: Int, col: Int, parser: ExpressionParser) extends TableEn
 
   override def set(value: String): Unit = {
     if (value.startsWith("=")) {
-      val expressionStr = value.substring(1).trim // get the expression
+      val expressionStr = value.substring(1).trim // get the expression without the =
       expression = Some(parser.parseExpression(expressionStr, row, col))
     }
     else {

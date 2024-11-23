@@ -1,4 +1,7 @@
-package CLIInterface
+package CLIInterface.Handlers
+
+import CLIInterface.CLIConfig
+import CLIInterface.Visitors.CLIVisitor
 
 //Basic interface for handling command-line interface
 trait ParameterHandler {

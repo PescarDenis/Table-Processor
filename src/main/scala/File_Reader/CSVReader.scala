@@ -5,7 +5,7 @@ import scala.io.Source
 //Now we are going to build a class to read the CSV file
 //The CSVReader has 2 constructors, the input source file
 //and the separator,
-class CSVReader(input: Source , separator: CSVSeparator) extends CSVIterator {
+class CSVReader(input: Source ,  separator: CSVSeparator) extends CSVIterator {
   //first we are going to want to filter all the rows which have only empty cells
   private val rows = input.getLines().filter(_.trim.nonEmpty) ///ensures that we are only
   //reading the rows in the file which contain actual data

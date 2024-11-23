@@ -1,6 +1,6 @@
 package CLIInterface.Handlers
 
-import CLIInterface.{CLIConfig, CLIVisitor}
+import CLIInterface.CLIConfig
 import Filters.{ChainedFilter, EmptyCellFilter, TableFilter, ValueFilter}
 
 class FiltersHandler extends BaseParameterHandler[List[TableFilter]](

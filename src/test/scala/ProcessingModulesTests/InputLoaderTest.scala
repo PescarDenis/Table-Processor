@@ -4,11 +4,11 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.BeforeAndAfter
 import ProcessingModules.InputLoader
 import CLIInterface.CLIConfig
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import File_Reader.CSVSeparator
 import Table.DefinedTabels.BaseTable
 import TableParser.{FileParser, ParseTableCells}
 import ExpressionParser.ParsingServices.DefaultExpressionParser
-import ExpressionParser.ParserLogic.ExpressionBuilder
 
 import java.io.{File, PrintWriter}
 import scala.util.Using

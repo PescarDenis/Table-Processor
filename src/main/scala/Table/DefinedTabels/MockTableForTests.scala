@@ -4,6 +4,7 @@ import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
 import Evaluation.EvaluationResult
 import TableParser.{FileParser, ParseTableCells}
 import ExpressionParser.ParserLogic.*
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 import Table.TableModel
 import Filters.Row

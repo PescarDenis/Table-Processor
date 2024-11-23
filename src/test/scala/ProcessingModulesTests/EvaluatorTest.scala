@@ -1,6 +1,6 @@
 package ProcessingModulesTests
 import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
-import ExpressionParser.ParserLogic.ExpressionBuilder
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 import ProcessingModules.Evaluator
 import Table.DefinedTabels.BaseTable

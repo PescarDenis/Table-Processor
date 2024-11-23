@@ -4,7 +4,7 @@ import Evaluation.EvaluationTypes.{EmptyResult, FloatResult, IntResult}
 import org.scalatest.funsuite.AnyFunSuite
 import Table.TableEntries.{Empty, Formula, Number, TableEntry}
 import ExpressionAST.EvaluationContext
-import ExpressionParser.ParserLogic.ExpressionBuilder
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import ExpressionParser.ParsingServices.DefaultExpressionParser
 import Table.DefinedTabels.{BaseTable, MockTableForTests}
 import TableParser.{FileParser, ParseTableCells}
