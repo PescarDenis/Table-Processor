@@ -1,6 +1,7 @@
 package CLIInterface
 
-import CLIInterface.Handlers._
+import CLIInterface.Handlers.*
+import CLIInterface.Visitors.{ArgumentVisitor, HelpVisitor}
 
 class CLI {
   private val handlers: List[ParameterHandler] = List(
@@ -20,41 +21,25 @@ class CLI {
       printHelp() // Help function
       return None
     }
-    
-    // Process the arguments and handlers
-    var config = CLIConfig() 
-    var remainingArgs = args
-    
-    // Iterate through the arguments
-    while (remainingArgs.nonEmpty) {
-      var argsProcessed = false
 
-      for (handler <- handlers if !argsProcessed) {
-        val (updatedConfig, argsAfterHandler) = handler.handle(remainingArgs, config) // If there are still arguments to process, update the configuration based on the handler
-        if (argsAfterHandler != remainingArgs) { 
-          config = updatedConfig
-          remainingArgs = argsAfterHandler
-          argsProcessed = true
-        }
-      }
-      
-      // If we introduce a wrong argument show an error of the argument and print the help page
-      if (!argsProcessed) {
-        println(s"Error: Unrecognized argument '${remainingArgs.head}'")
+    val visitor = ArgumentVisitor(args, CLIConfig())
+    handlers.foreach(_.accept(visitor))
+    
+
+      if (visitor.remainingArgs.nonEmpty) {
+        println(s"Error: Unrecognized argument '${visitor.remainingArgs.head}'")
         printHelp()
-        return None
+        None
+      } else if (visitor.config.inputFile.isEmpty) {
+        println("Error: --input-file is required.")
+        printHelp()
+        None
+      } else {
+        Some(visitor.config)
       }
     }
-    // Check for the required input file parameter
-    if (config.inputFile.isEmpty) {
-      println("Error: --input-file is required.")
-      printHelp()
-      None
-    } else {
-      Some(config)
-    }
-  }
-  // Helper method to print the help page 
+
+    // Helper method to print the help page
   private def printHelp(): Unit = {
     val visitor = new HelpVisitor()
     handlers.foreach(_.accept(visitor))
