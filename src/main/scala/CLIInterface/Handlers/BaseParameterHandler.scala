@@ -1,5 +1,6 @@
 package CLIInterface.Handlers
-import CLIInterface._
+import CLIInterface.*
+import CLIInterface.Visitors.CLIVisitor
 
 // Abstract class for handling specific types of command-line parameters
 abstract class BaseParameterHandler[T](val optionName: String,val description: String) extends ParameterHandler {
