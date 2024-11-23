@@ -1,75 +1,47 @@
 package ExpressionParser.LexerLogic
 
-import ExpressionParser._
+import ExpressionParser.ExpressionParsingError
+import ExpressionParser.LexerLogic.TokenHandlers.{TokenHandler,NumberHandler,ReferenceHandler,OperatorHandler}
 
-import scala.collection.mutable.ListBuffer
+// Define the actual Lexer classs
+class Lexer(input: String,row : Int, col : Int) {
 
-// Lexer class responsible for tokenizing an input string into individual tokens
-class Lexer(input: String, row: Int, col: Int) {
+  // Internal definition of supported operators
+  private val operators: Set[Char] = Set('+', '-', '*', '/')
 
-  private var pos = 0 // Position in the input string
+  private val state = LexerState(input) //C
+  private val handlers: Seq[TokenHandler] = Seq(
+    new NumberHandler,
+    new ReferenceHandler,
+    OperatorHandler(operators)
+  ) // Define the sequence of handlers that we have in our current configuration
 
-  def nextToken(): Option[Tokens] = {
-    skipWhitespaces()
+  // Method to get the next token
+  private def nextToken(): Tokens = {
+    skipWhitespaces()  //skip the white spaces
 
-    if (pos >= input.length) None
+    if (!state.hasMore) EndOfInputToken //if we reached the end it means that there are no tokens left
     else {
-      input(pos) match {
-        case c if c.isDigit => Some(parseNumber())
-        case c if c.isLetter => Some(parseReference())
-        case c if isOperator(c) => Some(parseOperator())
-        case c => throw ExpressionParsingError(
-          s"Unknown character at position $pos in cell ($row, $col): '$c' for the current expression $input"
-        )
-      }
+      // Try to parse each token and return the first occurrence of a valid token
+      handlers.iterator.flatMap(_.parse(state)).nextOption().getOrElse {
+          throw ExpressionParsingError(
+            s"Unknown character '${state.currentChar.get}' at position ${state.pos} in cell ($row, $col) for the current expression $input" //if we did not get a valid token throw an error
+          )
+        }
     }
   }
 
-  // Method to create the token list
-  def tokenize(): List[Tokens] = {
-    val tokens = ListBuffer[Tokens]()
-    while (pos < input.length) {
-      nextToken().foreach(tokens += _)
-    }
-    tokens.toList
-  }
-
-  //just keep the white spaces if there are any
+  // Helper method to skip the whitespaces
   private def skipWhitespaces(): Unit = {
-    while (pos < input.length && input(pos).isWhitespace) pos += 1
+    while (state.hasMore && state.currentChar.get.isWhitespace) state.advance()
   }
 
-  // Parse the number token
-  private def parseNumber(): NumberToken = {
-    val start = pos
-    var hasDot = false
-
-    while (pos < input.length && (input(pos).isDigit || (input(pos) == '.' && !hasDot))) {
-      if (input(pos) == '.') hasDot = true
-      pos += 1
-    }
-
-    NumberToken(input.substring(start, pos))
+  def tokenize(): Seq[Tokens] = {
+    Iterator.continually(nextToken()) // Create an infinite iterator that keeps calling the next token method to access the valid tokens
+      .takeWhile { // Process the tokens until we reach the end
+        case EndOfInputToken => false
+        case _               => true
+      } .toSeq //convert it back to a Seq
   }
   
-  // Parse the ref token 
-  private def parseReference(): RefToken = {
-    val start = pos
-
-    while (pos < input.length && input(pos).isLetterOrDigit) {
-      pos += 1
-    }
-
-    RefToken(input.substring(start, pos))
-  }
-  
-  //Parse the operator 
-  private def parseOperator(): OperatorToken = {
-    val operator = input(pos).toString
-    pos += 1
-    OperatorToken(operator)
-  }
-  
-  // Method to see if the current operator is supported for our implementation 
-  private def isOperator(char: Char): Boolean = Set('+', '-', '*', '/').contains(char)
 }
