@@ -47,6 +47,7 @@ object Main {
         } catch {
           case ex: Exception =>
             println(s"An error occurred: ${ex.getMessage}") // Print the errors 
+            cli.printHelp() // Print help when an exception occurs
         }
 
       case None =>
