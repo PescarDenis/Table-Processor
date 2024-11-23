@@ -2,9 +2,9 @@ package Main
 
 import ProcessingModules.*
 import CLIInterface.*
+import ExpressionParser.ParserLogic.ExpressionBuilder.ExpressionBuilder
 import TableParser.FileParser
 import ExpressionParser.ParsingServices.DefaultExpressionParser
-import ExpressionParser.ParserLogic.ExpressionBuilder
 import PrettyPrint.{CSVPrettyPrinter, MarkdownPrettyPrinter, PrettyPrinterRegistry}
 object Main {
 

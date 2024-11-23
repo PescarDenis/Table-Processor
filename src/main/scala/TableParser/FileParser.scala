@@ -19,11 +19,13 @@ class FileParser(parser: ExpressionParser) extends TableParser {
     new TableModel(entries)
   }
 
+
   // Helper method to parse each cell based on its entry formula,number or empty cell
     private def parseCell(cellValue: String, rowIndex: Int, colIndex: Int): TableEntry = {
     if (cellValue.trim.isEmpty) {
       Empty(rowIndex, colIndex)
-    } else if (cellValue.startsWith("=") || cellValue.matches(".*[+\\-*/].*")) {
+    } else if (cellValue.startsWith("=") || (cellValue.matches(".*[+*/].*") && !cellValue.matches("-?\\d+"))) { //It checks if it is a formula based on : starts with = or, there is
+      //a defined operator of ours that is in that cell for example 5*2 is also treated as a formula, and ensures that we don't mistake the numbers like -22 as formulas instead of numbers
       val formulaEntry =  Formula(rowIndex, colIndex,parser)
       formulaEntry.set(cellValue)
       formulaEntry
